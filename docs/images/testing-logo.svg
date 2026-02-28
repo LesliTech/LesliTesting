@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect x="64" y="20" width="320" height="420" rx="20" fill="#E2E8F0" />
+  
+  <rect x="110" y="80" width="230" height="15" rx="7.5" fill="#475569" />
+  <rect x="110" y="115" width="230" height="15" rx="7.5" fill="#475569" />
+  <rect x="110" y="150" width="120" height="15" rx="7.5" fill="#475569" />
+
+  <rect x="90" y="210" width="85" height="85" rx="12" fill="#A855F7" />
+  <path d="M110 252 l15 15 l30 -30" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="200" y="225" width="120" height="12" rx="6" fill="#475569" />
+  <rect x="200" y="255" width="80" height="12" rx="6" fill="#475569" />
+
+  <rect x="90" y="325" width="85" height="85" rx="12" fill="#22C55E" />
+  <path d="M110 367 l15 15 l30 -30" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="200" y="340" width="120" height="12" rx="6" fill="#475569" />
+  <rect x="200" y="370" width="80" height="12" rx="6" fill="#475569" />
+
+  <path d="M305 230 h110 a15 15 0 0 1 15 15 v10 a15 15 0 0 1 -15 15 h-110 a15 15 0 0 1 -15 -15 v-10 a15 15 0 0 1 15 -15" fill="#3B82F6" />
+  <path d="M320 270 v150 a50 50 0 0 0 100 0 v-150" fill="#60A5FA" />
+  <rect x="340" y="300" width="60" height="110" rx="30" fill="#EAB308" />
+</svg>
