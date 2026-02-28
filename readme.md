@@ -1,5 +1,5 @@
 <div align="center" class="documentation-header">
-    <img width="100" alt="LesliDate logo" src="./docs/images/testing-logo.svg" />
+    <img width="100" alt="LesliTesting logo" src="./docs/images/testing-logo.svg" />
     <h3 align="center">Shared testing and coverage configuration for the Lesli Platform.</h3>
 </div>
 
@@ -7,14 +7,14 @@
 <hr/>
 
 <div align="center" class="documentation-statics">
-    <a target="blank" href="https://github.com/LesliTech/LesliDate/actions">
+    <a target="blank" href="https://github.com/LesliTech/LesliTesting/actions">
         <img alt="Tests passing" src="https://img.shields.io/badge/Tests-passing-green?style=for-the-badge&logo=github">
     </a>
-    <a target="blank" href="https://rubygems.org/gems/lesli_date">
-        <img alt="Gem Version" src="https://img.shields.io/gem/v/lesli_date?style=for-the-badge&logo=ruby">
+    <a target="blank" href="https://rubygems.org/gems/lesli_testing">
+        <img alt="Gem Version" src="https://img.shields.io/gem/v/lesli_testing?style=for-the-badge&logo=ruby">
     </a>
-    <a target="blank" href="https://codecov.io/github/LesliTech/LesliDate"> 
-        <img alt="Codecov" src="https://img.shields.io/codecov/c/github/LesliTech/LesliDate?style=for-the-badge&logo=codecov">
+    <a target="blank" href="https://codecov.io/github/LesliTech/LesliTesting"> 
+        <img alt="Codecov" src="https://img.shields.io/codecov/c/github/LesliTech/LesliTesting?style=for-the-badge&logo=codecov">
     </a>
     <a target="blank" href="https://sonarcloud.io/project/overview?id=LesliTech_LesliView"> 
         <img alt="Sonar Quality Gate" src="https://img.shields.io/sonar/quality_gate/LesliTech_LesliView?server=https%3A%2F%2Fsonarcloud.io&style=for-the-badge&logo=sonarqubecloud&label=Quality">
@@ -29,23 +29,13 @@
 
 ```shell
 # Add LesliAdmin engine gem
-bundle add lesli_date
+bundle add lesli_testing
 ```
-
-
-<br />
-<hr/>
-<br />
-
-### Demo
-
-* [online demo](https://demo.lesli.dev/)
-* [docker demo](https://github.com/LesliTech/lesli-docker-demo)
 
 
 ### Documentation
 * [website](https://www.lesli.dev/)
-* [documentation](https://www.lesli.dev/gems/date/)
+* [documentation](https://www.lesli.dev/gems/testing/)
 
 
 ### Connect with Lesli
