@@ -29,8 +29,51 @@
 # // · ~·~     ~·~     ~·~     ~·~     ~·~     ~·~     ~·~     ~·~     ~·~
 # // · 
 
-#
-require_relative "lesli_testing/version"
+
+# Load code coverage tools
+require "simplecov"
+require "simplecov-console"
+require "simplecov-cobertura"
+
+
+# Load test frameworks
+require "minitest/reporters"
+require "color_pound_spec_reporter"
+
+
+# Load test configuration and test helper modules
+require_relative "config"
+require_relative "coverage"
+require_relative "testers"
 
 module LesliTesting
+    class Error < StandardError; end
+
+    class << self
+
+        def load(engine_module = nil, options = {})
+
+            name = engine_module ? engine_module.name : "RailsApp"
+
+            # 1. Notify
+            show_welcome_message
+
+            # 2. Start Coverage
+            LesliTesting::Coverage.start(name, options[:min_coverage] || 40)
+
+            # 3. Apply Minitest/Reporters/Paths
+            LesliTesting::Config.apply(engine_module)
+        end
+
+        private
+
+        def show_welcome_message
+            L2.info(
+                "Running Lesli tests...",
+                "For a better result run test over a clean database",
+                "You can use: rake dev:db:reset")
+
+            L2.br
+        end
+    end
 end

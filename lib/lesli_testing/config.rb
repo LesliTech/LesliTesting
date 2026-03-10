@@ -67,7 +67,6 @@ module LesliTesting
                 Minitest::Reporters::JUnitReporter.new("coverage/reports"),
                 ColorPoundSpecReporter.new
             ])
-
         end
     end
 end
