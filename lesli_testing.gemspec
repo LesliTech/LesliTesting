@@ -69,7 +69,9 @@ Gem::Specification.new do |spec|
     #     Use the standard command: bin/rails test.
     spec.add_dependency "minitest", "~> 5.0"
 
+    # When mail is sent from your application, Letter Opener will 
+    # open a preview in the browser instead of sending.
+    # https://github.com/ryanb/letter_opener
     spec.add_dependency "letter_opener"
 
-    spec.add_dependency "propshaft"
 end

@@ -51,17 +51,21 @@ module LesliTesting
 
     class << self
 
-        def load(engine_module = nil, options = {})
+        def start_coverage!(engine_module = nil, options = {})
+            return if defined?(SimpleCov) && SimpleCov.running
 
             name = engine_module ? engine_module.name : "RailsApp"
 
-            # 1. Notify
+            # Start Coverage
+            LesliTesting::Coverage.start(name, options[:min_coverage] || 40)
+        end
+
+        def configure_tests!(engine_module = nil)
+
+            # Notify
             show_welcome_message
 
-            # 2. Start Coverage
-            LesliTesting::Coverage.start(name, options[:min_coverage] || 40)
-
-            # 3. Apply Minitest/Reporters/Paths
+            # Apply Minitest/Reporters/Paths
             LesliTesting::Config.apply(engine_module)
         end
 
@@ -71,7 +75,8 @@ module LesliTesting
             L2.info(
                 "Running Lesli tests...",
                 "For a better result run test over a clean database",
-                "You can use: rake dev:db:reset")
+                "You can use: rake dev:db:reset"
+            )
 
             L2.br
         end

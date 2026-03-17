@@ -44,29 +44,30 @@ module LesliTesting
             # Define the limit to allow missing tested code
             SimpleCov::Formatter::Console.missing_len = 10
 
-            SimpleCov.start do
-                self.command_name engine_name
+            SimpleCov.start "rails" do
+                command_name engine_name
 
                 # Standard filters for all Lesli engines
                 add_filter [
                     "/app/assets", 
                     "/app/jobs", 
                     "/config", 
+                    "/docs",
                     "/db", 
                     "/lib/test", 
                     "/test", 
+                    "/test/dummy/",
                     "/vendor"
                 ]
 
                 # Add your groups
                 add_group "Models", "app/models"
-                add_group "Operators", "app/operators"
-                add_group "Validators", "app/validators"
+                add_group "Services", "app/services"
                 add_group "Controllers", "app/controllers"
-            end
 
-            # Minimum expected coverage percentage
-            SimpleCov.minimum_coverage min_coverage
+                # Minimum expected coverage percentage
+                minimum_coverage min_coverage
+            end
         end
     end
 end
