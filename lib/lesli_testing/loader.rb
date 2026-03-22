@@ -37,14 +37,18 @@ require "simplecov-cobertura"
 
 
 # Load test frameworks
-require "minitest/reporters"
-require "color_pound_spec_reporter"
+require_relative "reporters/cli_reporter"
+require "minitest/lesli_testing_plugin"
 
+# Force Minitest to know about Lesli Minitest reporter plugin
+unless Minitest.extensions.include?("lesli_testing")
+    Minitest.register_plugin("lesli_testing") 
+end
 
 # Load test configuration and test helper modules
-require_relative "config"
 require_relative "coverage"
 require_relative "testers"
+require_relative "config"
 
 module LesliTesting
     class Error < StandardError; end
@@ -62,23 +66,8 @@ module LesliTesting
 
         def configure_tests!(engine_module = nil)
 
-            # Notify
-            show_welcome_message
-
             # Apply Minitest/Reporters/Paths
             LesliTesting::Config.apply(engine_module)
-        end
-
-        private
-
-        def show_welcome_message
-            L2.info(
-                "Running Lesli tests...",
-                "For a better result run test over a clean database",
-                "You can use: rake dev:db:reset"
-            )
-
-            L2.br
         end
     end
 end

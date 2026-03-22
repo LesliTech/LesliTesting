@@ -27,51 +27,39 @@ Gem::Specification.new do |spec|
     spec.metadata["documentation_uri"]  = "https://www.lesli.dev/gems/testing/"
 
     # Specify which files should be added to the gem when it is released.
-    # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
-    gemspec = File.basename(__FILE__)
-    spec.files = IO.popen(%w[git ls-files -z], chdir: __dir__, err: IO::NULL) do |ls|
-        ls.readlines("\x0", chomp: true).reject do |f|
-            (f == gemspec) ||
-            f.start_with?(*%w[bin/ Gemfile .gitignore test/ .github/])
-        end
+    spec.files = Dir.chdir(File.expand_path(__dir__)) do
+        Dir["{lib}/**/*", "license", "readme.md"]
     end
+    
     spec.bindir = "exe"
     spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
     spec.require_paths = ["lib"]
 
 
-    # Create customizable MiniTest output formats. 
-    # https://github.com/minitest-reporters/minitest-reporters
-    spec.add_dependency "minitest-reporters"
-
-    # Beautiful Minitest Color Reporter 
-    # https://github.com/danielpclark/color_pound_spec_reporter
-    spec.add_dependency "color_pound_spec_reporter"
-
-    # Code coverage
-    # https://github.com/simplecov-ruby/simplecov
-    spec.add_dependency "simplecov", "0.22.0"
-
-    # Code coverage stats in the console
-    # https://github.com/chetan/simplecov-console
-    spec.add_dependency "simplecov-console", "0.9.4"
-
-    # Produces Cobertura XML formatted output from SimpleCov
-    # https://github.com/jessebs/simplecov-cobertura
-    spec.add_dependency "simplecov-cobertura"
-
-    # Brakeman detects security vulnerabilities in Ruby on Rails applications via static analysis.
-    # https://github.com/presidentbeef/brakeman
-    spec.add_dependency "brakeman"
-
     # Until a patch for Rails 8.1.2 (or higher) is released specifically addressing the Minitest 6 boot sequence, the most stable way to run your tests is:
     #     Keep Minitest at ~> 5.0 in your Gemfile.
     #     Use the standard command: bin/rails test.
-    spec.add_dependency "minitest", "~> 5.0"
+    spec.add_dependency "minitest", "~> 6.0.0"
+
+    # Code coverage
+    # https://github.com/simplecov-ruby/simplecov
+    spec.add_dependency "simplecov", "~> 0.22.0"
+
+    # Code coverage stats in the console
+    # https://github.com/chetan/simplecov-console
+    spec.add_dependency "simplecov-console", "~> 0.9.0"
+
+    # Produces Cobertura XML formatted output from SimpleCov
+    # https://github.com/jessebs/simplecov-cobertura
+    spec.add_dependency "simplecov-cobertura", "~> 3.1.0"
+
+    # Brakeman detects security vulnerabilities in Ruby on Rails applications via static analysis.
+    # https://github.com/presidentbeef/brakeman
+    spec.add_dependency "brakeman", "~> 8.0.0"
 
     # When mail is sent from your application, Letter Opener will 
     # open a preview in the browser instead of sending.
     # https://github.com/ryanb/letter_opener
-    spec.add_dependency "letter_opener"
+    spec.add_dependency "letter_opener", "~> 1.10.0"
 
 end

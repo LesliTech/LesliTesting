@@ -33,9 +33,6 @@ Building a better future, one line of code at a time.
 module LesliTesting
     module Config
         def self.apply(engine_module = nil)
-            
-            # Workaround for color_pound_spec_reporter
-            Object.const_set(:MiniTest, Minitest) unless defined?(MiniTest)
 
             # Load dummy app for unit testing
             # Run tests across all the engines: LESLI_INTEGRATION_TEST=true rails test
@@ -61,12 +58,6 @@ module LesliTesting
                     ActiveSupport::TestCase.fixtures :all
                 end
             end
-
-            Minitest::Reporters.use!([
-                Minitest::Reporters::DefaultReporter.new(color: true),
-                Minitest::Reporters::JUnitReporter.new("coverage/reports"),
-                ColorPoundSpecReporter.new
-            ])
         end
     end
 end
