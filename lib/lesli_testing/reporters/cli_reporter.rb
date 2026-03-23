@@ -7,34 +7,43 @@ module LesliTesting
         class CliReporter < Minitest::StatisticsReporter
             def start
                 super
-                Termline::Msg.builder("Running Lesli tests...", tag: nil, color: :blue)
-                Termline::Msg.builder("For a better result run test over a clean database", tag: nil, color: :blue)
-                Termline::Msg.builder("You can use: rake dev:db:reset", tag: nil, color: :blue)
+                Termline.m(
+                    Termline::Style.colorize(" Running Lesli tests...", :blue),
+                    Termline::Style.colorize(" -> For a better result run test over a clean database", :blue),
+                    Termline::Style.colorize(" -> You can use: rake dev:db:reset", :blue)
+                )
                 Termline.br
             end
 
             def record(test)
                 super
 
-                #name = "#{test.klass}# -> #{test.name}: with #{test.assertions} asserts"
-                name = "#{test.klass}# -> #{test.name}"
+                assert_color = :green
+                assert_color = :yellow if test.assertions < 5
+                assert_color = :red if test.assertions < 2
 
+                parts = []
+                parts << Termline::Style.colorize('['+Time.now.strftime('%H:%M:%S:%L')+']', :gray)
+                
                 case test.result_code
                 when "."
-                    puts("#{Termline::Config.colorize("PASS", :green)} :: #{Termline::Config.colorize(test.klass, :blue)} -> #{Termline::Config.colorize(test.name, :skyblue)}")
-                    ## show asserts amount only if it is to low
-                    ## show time if it is to hight
-                    # example:
-                        # PASS :: Controller -> method (1 assertions.yellow)
-                        # PASS :: Controller -> method (30 seconds.yellow)
-                    ###{test.assertions} assertions in #{"(%.2fs)" % test.time} for
+                    parts << Termline::Style.colorize("PASS", :green)
                 when "F"
-                    Termline::Msg.builder(name, tag: "FAIL:", color: :red)
+                    parts << Termline::Style.colorize("FAIL", :red)
                 when "E"
-                    Termline::Msg.builder(name, tag: "ERROR:", color: :red)
+                    parts << Termline::Style.colorize("ERROR", :red)
                 when "S"
-                    Termline::Msg.builder(name, tag: "SKIP:", color: :yellow)
+                    parts << Termline::Style.colorize("SKIP", :yellow)
                 end
+
+                parts << '::'
+                parts << Termline::Style.colorize(test.klass, :blue)
+                parts << '->'
+                parts << Termline::Style.colorize(test.name, :skyblue)
+                parts << Termline::Style.colorize("(#{ test.assertions} asserts)", assert_color) 
+                parts << Termline::Style.colorize("#{"(%.2fs)" % test.time}", :red) if test.time > 1 
+
+                puts(parts.compact.join(" ").strip)
             end
 
             def report
@@ -51,24 +60,30 @@ module LesliTesting
                 success_rate = total_tests.zero? ? 0 : ((passed.to_f / total_tests) * 100).round(1)
                 status = (total_failures.zero? && total_errors.zero?) ? "PASS" : "FAIL"
 
-                Termline.br
+                Termline.br 2
 
-                Termline::Msg.builder(status,                   tag:'STATUS . . . . . . . :', color: :blue)
-                Termline::Msg.builder(total_tests,              tag:'TESTS. . . . . . . . :', color: :blue)
-                Termline::Msg.builder(passed,                   tag:'PASSED . . . . . . . :', color: :blue)
-                Termline::Msg.builder(total_failures,           tag:'FAILURES . . . . . . :', color: :blue)
-                Termline::Msg.builder(total_errors,             tag:'ERRORS . . . . . . . :', color: :blue)
-                Termline::Msg.builder(total_skips,              tag:'SKIPPED. . . . . . . :', color: :blue)
-                Termline::Msg.builder(total_assertions,         tag:'ASSERTIONS . . . . . :', color: :blue)
-                Termline::Msg.builder("#{success_rate}%",       tag:'SUCCESS RATE . . . . :', color: :blue)
-                Termline::Msg.builder(format("%.2fs", duration),tag:'TIME . . . . . . . . :', color: :blue)
+                status_color = :blue
+                status_color = :red if status == 'FAIL'
 
-                Termline.br
+                failures_color = :blue
+                failures_color = :red if total_failures > 0
+
+                Termline::Msg.builder(status,                   tag:'STATUS . . . . . . . :', color: status_color, timestamp:nil)
+                Termline::Msg.builder(total_tests,              tag:'TESTS. . . . . . . . :', color: :blue, timestamp:nil)
+                Termline::Msg.builder(passed,                   tag:'PASSED . . . . . . . :', color: :blue, timestamp:nil)
+                Termline::Msg.builder(total_failures,           tag:'FAILURES . . . . . . :', color: failures_color, timestamp:nil)
+                Termline::Msg.builder(total_errors,             tag:'ERRORS . . . . . . . :', color: :blue, timestamp:nil)
+                Termline::Msg.builder(total_skips,              tag:'SKIPPED. . . . . . . :', color: :blue, timestamp:nil)
+                Termline::Msg.builder(total_assertions,         tag:'ASSERTIONS . . . . . :', color: :blue, timestamp:nil)
+                Termline::Msg.builder("#{success_rate}%",       tag:'SUCCESS RATE . . . . :', color: failures_color, timestamp:nil)
+                Termline::Msg.builder(format("%.2fs", duration),tag:'TIME . . . . . . . . :', color: :blue, timestamp:nil)
+
+                Termline.br 2
 
                 if status == "PASS"
                     Termline.success("Test suite passed")
                 else
-                    Termline.error("Test suite failed")
+                    Termline.danger("Test suite failed", tag:'FAILURE')
                 end
 
                 Termline.br
@@ -84,29 +99,26 @@ module LesliTesting
 
                 return if failed_results.empty?
 
-                puts
-                Termline.danger("Failure Details")
-
                 failed_results.each_with_index do |result, index|
                     failure = result.failure
-                    label = failure.is_a?(Minitest::Assertion) ? "FAILURE" : "ERROR"
-                    title = "#{index + 1}) #{label} - #{result.class}##{result.name}"
+                    failure_tag = failure.is_a?(Minitest::Assertion) ? "FAILURE" : "ERROR"
+                    failure_msg = "#{result.class}##{result.name} (#{result.assertions} asserts)"
+
+                    Termline.br
+                    Termline.line(6)
+                    Termline.br
 
                     if failure.is_a?(Minitest::Assertion)
-                    Termline.error(title)
+                        Termline::Msg.builder(failure_msg, tag: " #{Termline::Style.icon(:error)} #{failure_tag} #{index + 1}:", color: :red, timestamp:nil)
+                        puts "    #{Termline::Style.colorize('Location:', :yellow)} #{result.source_location.first} (line: #{result.source_location.second})"
+                        puts "    #{Termline::Style.colorize(result.failure.message.to_s.lines.first.strip, :green)}"
+                        puts "      #{Termline::Style.colorize(result.failure.message.to_s.lines.second.strip, :red)}"
                     else
-                    Termline.warning(title)
+                        Termline.warning(failure_msg, tag: failure_tag)
                     end
-
-                    first_line = failure.message.to_s.lines.first.to_s.strip
-                    puts "  Message: #{first_line}"
-
-                    if failure.backtrace&.any?
-                    puts "  Source:  #{failure.backtrace.first}"
-                    end
-
-                    puts
                 end
+
+                Termline.br
             end
         end
     end
