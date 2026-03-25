@@ -68,15 +68,15 @@ module LesliTesting
                 failures_color = :blue
                 failures_color = :red if total_failures > 0
 
-                Termline::Msg.builder(status,                   tag:'STATUS . . . . . . . :', color: status_color, timestamp:nil)
-                Termline::Msg.builder(total_tests,              tag:'TESTS. . . . . . . . :', color: :blue, timestamp:nil)
-                Termline::Msg.builder(passed,                   tag:'PASSED . . . . . . . :', color: :blue, timestamp:nil)
-                Termline::Msg.builder(total_failures,           tag:'FAILURES . . . . . . :', color: failures_color, timestamp:nil)
-                Termline::Msg.builder(total_errors,             tag:'ERRORS . . . . . . . :', color: :blue, timestamp:nil)
-                Termline::Msg.builder(total_skips,              tag:'SKIPPED. . . . . . . :', color: :blue, timestamp:nil)
-                Termline::Msg.builder(total_assertions,         tag:'ASSERTIONS . . . . . :', color: :blue, timestamp:nil)
-                Termline::Msg.builder("#{success_rate}%",       tag:'SUCCESS RATE . . . . :', color: failures_color, timestamp:nil)
-                Termline::Msg.builder(format("%.2fs", duration),tag:'TIME . . . . . . . . :', color: :blue, timestamp:nil)
+                puts(Termline::Msg.builder(status,                   tag:'STATUS . . . . . . . :', color: status_color, timestamp:nil))
+                puts(Termline::Msg.builder(total_tests,              tag:'TESTS. . . . . . . . :', color: :blue, timestamp:nil))
+                puts(Termline::Msg.builder(passed,                   tag:'PASSED . . . . . . . :', color: :blue, timestamp:nil))
+                puts(Termline::Msg.builder(total_failures,           tag:'FAILURES . . . . . . :', color: failures_color, timestamp:nil))
+                puts(Termline::Msg.builder(total_errors,             tag:'ERRORS . . . . . . . :', color: :blue, timestamp:nil))
+                puts(Termline::Msg.builder(total_skips,              tag:'SKIPPED. . . . . . . :', color: :blue, timestamp:nil))
+                puts(Termline::Msg.builder(total_assertions,         tag:'ASSERTIONS . . . . . :', color: :blue, timestamp:nil))
+                puts(Termline::Msg.builder("#{success_rate}%",       tag:'SUCCESS RATE . . . . :', color: failures_color, timestamp:nil))
+                puts(Termline::Msg.builder(format("%.2fs", duration),tag:'TIME . . . . . . . . :', color: :blue, timestamp:nil))
 
                 Termline.br 2
 
