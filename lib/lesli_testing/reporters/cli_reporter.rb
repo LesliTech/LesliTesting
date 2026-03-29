@@ -7,43 +7,51 @@ module LesliTesting
         class CliReporter < Minitest::StatisticsReporter
             def start
                 super
-                Termline.m(
-                    Termline::Style.colorize(" Running Lesli tests...", :blue),
-                    Termline::Style.colorize(" -> For a better result run test over a clean database", :blue),
-                    Termline::Style.colorize(" -> You can use: rake dev:db:reset", :blue)
-                )
+
                 Termline.br
+
+                Termline.m(
+                    Termline::Style.colorize("Running Lesli tests...", :blue),
+                    Termline::Style.colorize("-> For a better result run test over a clean database", :blue),
+                    Termline::Style.colorize("-> You can use: rake dev:db:reset", :blue)
+                )
+
+                Termline.br 2
             end
 
             def record(test)
                 super
 
-                assert_color = :green
-                assert_color = :yellow if test.assertions < 5
-                assert_color = :red if test.assertions < 2
+                # Map result codes to styles
+                status_map = { 
+                    "." => [:green, "PASS"], 
+                    "S" => [:yellow, "SKIP"], 
+                    "E" => [:red, "ERROR"], 
+                    "F" => [:red, "FAIL"]
+                }
+                color, label = status_map[test.result_code] || [:gray, "????"]
 
-                parts = []
-                parts << Termline::Style.colorize('['+Time.now.strftime('%H:%M:%S:%L')+']', :gray)
-                
-                case test.result_code
-                when "."
-                    parts << Termline::Style.colorize("PASS", :green)
-                when "F"
-                    parts << Termline::Style.colorize("FAIL", :red)
-                when "E"
-                    parts << Termline::Style.colorize("ERROR", :red)
-                when "S"
-                    parts << Termline::Style.colorize("SKIP", :yellow)
+                # Determine assertion health
+                assert_color = case test.assertions
+                    when 0..1 then :red
+                    when 2..4 then :yellow
+                    else :green
                 end
 
-                parts << '::'
-                parts << Termline::Style.colorize(test.klass, :blue)
-                parts << '->'
-                parts << Termline::Style.colorize(test.name, :skyblue)
-                parts << Termline::Style.colorize("(#{ test.assertions} asserts)", assert_color) 
-                parts << Termline::Style.colorize("#{"(%.2fs)" % test.time}", :red) if test.time > 1 
+                parts = [
+                    Termline::Style.colorize("[#{Time.now.strftime('%H:%M:%S')}]", :gray),
+                    Termline::Style.colorize(label, color),
+                    "::",
+                    Termline::Style.colorize(test.klass, :blue),
+                    "->",
+                    Termline::Style.colorize(test.name, :skyblue),
+                    Termline::Style.colorize("(#{test.assertions} asserts)", assert_color)
+                ]
 
-                puts(parts.compact.join(" ").strip)
+                # Add execution time per test
+                parts << Termline::Style.colorize("(%.2fs)" % test.time, :red) if test.time > 1
+
+                puts(parts.join(" "))
             end
 
             def report
@@ -86,7 +94,7 @@ module LesliTesting
                     Termline.danger("Test suite failed", tag:'FAILURE')
                 end
 
-                Termline.br
+                Termline.br 2
 
                 print_failure_details if total_failures.positive? || total_errors.positive?
 
@@ -104,7 +112,8 @@ module LesliTesting
                     failure_tag = failure.is_a?(Minitest::Assertion) ? "FAILURE" : "ERROR"
                     failure_msg = "#{result.class}##{result.name} (#{result.assertions} asserts)"
 
-                    location_file = "#{result.source_location.first} (line: #{result.source_location.second})"
+                    file, line = result.source_location
+                    location_file = file ? "#{file} (line: #{line})" : "Location unknown"
 
                     Termline.br
                     Termline.line(6)
@@ -116,6 +125,7 @@ module LesliTesting
                     if failure.is_a?(Minitest::Assertion)
                         result.failure.message.to_s.lines.each do |message|
                             puts(parse_minitest_assertion_messages(message))
+                            #puts(parse_minitest_assertion_messages2(message))
                         end
                     end
                 end
@@ -123,11 +133,41 @@ module LesliTesting
                 Termline.br
             end
 
-            def parse_minitest_assertion_messages message
+            def parse_minitest_assertion_messages2 message
                 msg = message.strip
                 return Termline::Style.colorize(" +  #{msg}", :green) if msg.start_with? "Expected:"
                 return Termline::Style.colorize(" -    #{msg}", :red) if msg.start_with? "Actual:"
                 return Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{msg}", :yellow)
+            end
+
+            def parse_minitest_assertion_messages(message)
+            msg = message.strip
+
+            case msg
+
+                # 1. Boolean/Nil Failures (e.g., "Expected true to be nil" or "Expected false to be truthy")
+                when /Expected (.*) to be (nil|truthy|falsey)/, /Expected (.*) to be (.*)/
+                    Termline::Style.colorize(" #{Termline::Style.icon(:info)}  #{msg}", :skyblue)
+
+                # 2. Standard Diffs (Expected vs Actual)
+                when /^Expected:?\s+/
+                    Termline::Style.colorize(" #{Termline::Style.icon(:add)}  #{msg}", :green)
+
+                when /^Actual:?\s+/
+                    Termline::Style.colorize(" #{Termline::Style.icon(:remove)}    #{msg}", :red)
+
+                # 3. Rails Difference Failures (e.g., "User.count" didn't change by 1)
+                when /"(.*)" didn't change by (.*)/, /actual change was (.*)/
+                    Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{msg}", :yellow)
+
+                # 4. Collection/Count Failures (e.g., Expected 5 elements, found 2)
+                when /Expected (.*) elements?, found (.*)/, /Expected exactly (.*) nodes/
+                    Termline::Style.colorize(" #{Termline::Style.icon(:list)}  #{msg}", :magenta)
+
+                # 5. Fallback for custom messages (anything else)
+                else
+                    Termline::Style.colorize(" #{Termline::Style.icon(:arrow_right)}  #{msg}", :gray)
+                end
             end
         end
     end
