@@ -104,21 +104,30 @@ module LesliTesting
                     failure_tag = failure.is_a?(Minitest::Assertion) ? "FAILURE" : "ERROR"
                     failure_msg = "#{result.class}##{result.name} (#{result.assertions} asserts)"
 
+                    location_file = "#{result.source_location.first} (line: #{result.source_location.second})"
+
                     Termline.br
                     Termline.line(6)
                     Termline.br
 
+                    puts Termline::Msg.builder(failure_msg, tag: " #{Termline::Style.icon(:error)} #{failure_tag} #{index + 1}:", color: :red, timestamp:nil)
+                    puts Termline::Msg.builder(location_file, tag: " #{Termline::Style.icon(:debug)}  Location:", color: :yellow, timestamp:nil)
+
                     if failure.is_a?(Minitest::Assertion)
-                        Termline::Msg.builder(failure_msg, tag: " #{Termline::Style.icon(:error)} #{failure_tag} #{index + 1}:", color: :red, timestamp:nil)
-                        puts "    #{Termline::Style.colorize('Location:', :yellow)} #{result.source_location.first} (line: #{result.source_location.second})"
-                        puts "    #{Termline::Style.colorize(result.failure.message.to_s.lines.first.strip, :green)}"
-                        puts "      #{Termline::Style.colorize(result.failure.message.to_s.lines.second.strip, :red)}"
-                    else
-                        Termline.warning(failure_msg, tag: failure_tag)
+                        result.failure.message.to_s.lines.each do |message|
+                            puts(parse_minitest_assertion_messages(message))
+                        end
                     end
                 end
 
                 Termline.br
+            end
+
+            def parse_minitest_assertion_messages message
+                msg = message.strip
+                return Termline::Style.colorize(" +  #{msg}", :green) if msg.start_with? "Expected:"
+                return Termline::Style.colorize(" -    #{msg}", :red) if msg.start_with? "Actual:"
+                return Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{msg}", :yellow)
             end
         end
     end

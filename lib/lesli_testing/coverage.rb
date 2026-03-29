@@ -54,9 +54,9 @@ module LesliTesting
                     "/config", 
                     "/docs",
                     "/db", 
-                    "/lib", 
                     "/test", 
                     "/test/dummy/",
+                    "/lib/tasks", 
                     "/vendor"
                 ]
 

@@ -37,8 +37,8 @@ require "simplecov-cobertura"
 
 
 # Load test frameworks
-require_relative "reporters/cli_reporter"
 require "minitest/lesli_testing_plugin"
+require_relative "reporters/cli_reporter"
 
 # Force Minitest to know about Lesli Minitest reporter plugin
 unless Minitest.extensions.include?("lesli_testing")

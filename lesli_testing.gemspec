@@ -62,4 +62,10 @@ Gem::Specification.new do |spec|
     # https://github.com/ryanb/letter_opener
     spec.add_dependency "letter_opener", "~> 1.10.0"
 
+
+    # Termline is a lightweight Ruby gem for printing terminal 
+    # messages with colors, icons, and semantic log levels.
+    # https://github.com/LesliTech/Termline
+    spec.add_dependency "termline", "~> 1.1.0"
+
 end

@@ -38,10 +38,6 @@ module LesliTesting
             # Run tests across all the engines: LESLI_INTEGRATION_TEST=true rails test
             # Run tests for the current engine: rails test
             if engine_module
-                # Migration and Fixture logic goes here...
-                ActiveRecord::Migrator.migrations_paths = [engine_module.root.join("db/migrate").to_s] if defined?(ActiveRecord)
-                ActiveRecord::Migrator.migrations_paths = [engine_module.root.join("db/migrate/1.0").to_s] if defined?(ActiveRecord)
-
 
                 # Load fixtures from the engine
                 if ActiveSupport::TestCase.respond_to?(:fixture_paths=)

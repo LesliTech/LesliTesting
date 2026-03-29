@@ -31,6 +31,7 @@
 
 #
 require_relative "lesli_testing/version"
+require "termline" unless defined?(Termline)
 
 module LesliTesting
 end
