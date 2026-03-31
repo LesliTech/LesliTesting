@@ -55,16 +55,19 @@ module LesliTesting
 
     class << self
 
-        def start_coverage!(engine_module = nil, options = {})
-            return if defined?(SimpleCov) && SimpleCov.running
+        attr_accessor :engine_module; 
 
-            name = engine_module ? engine_module.name : "RailsApp"
+        def configure(engine_module = nil, options = {})
+
+            engine_module = engine_module ? engine_module.name : "RailsApp"
+
+            return if defined?(SimpleCov) && SimpleCov.running            
 
             # Start Coverage
-            LesliTesting::Coverage.start(name, options[:min_coverage] || 40)
+            LesliTesting::Coverage.start(engine_module, options[:min_coverage] || 40)
         end
 
-        def configure_tests!(engine_module = nil)
+        def configure_tests()
 
             # Apply Minitest/Reporters/Paths
             LesliTesting::Config.apply(engine_module)

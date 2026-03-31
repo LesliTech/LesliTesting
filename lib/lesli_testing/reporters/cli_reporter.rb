@@ -22,6 +22,9 @@ module LesliTesting
             def record(test)
                 super
 
+                # Only print the line if the configuration allows it
+                return if ENV["QUIET"]
+
                 # Map result codes to styles
                 status_map = { 
                     "." => [:green, "PASS"], 
