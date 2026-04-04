@@ -59,12 +59,11 @@ module LesliTesting
 
         attr_accessor :engine_module; 
 
-        def configure(engine_module = nil, options = {})
+        def configure(engine_module = nil)
             self.engine_module = engine_module
-            configure_coverage(engine_module, options)
         end
 
-        def configure_coverage(engine_module, options)
+        def configure_coverage(options)
 
             engine_name = self.engine_module ? self.engine_module.name : "RailsApp"
 
@@ -74,7 +73,7 @@ module LesliTesting
             LesliTesting::Coverage.start(engine_name, options[:min_coverage] || 40)
         end 
 
-        def configure_tests()
+        def configure_engine()
 
             # Apply Minitest/Reporters/Paths
             LesliTesting::Config.apply(self.engine_module)

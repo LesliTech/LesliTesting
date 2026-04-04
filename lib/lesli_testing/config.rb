@@ -34,6 +34,21 @@ module LesliTesting
     module Config
         def self.apply(engine_module = nil)
 
+            if defined?(Lesli)
+                # Load fixtures from Lesli
+                if ActiveSupport::TestCase.respond_to?(:fixture_paths=)
+                    ActiveSupport::TestCase.fixture_paths = [ Lesli::Engine.root.join("test", "fixtures").to_s ]
+                    ActionDispatch::IntegrationTest.fixture_paths = ActiveSupport::TestCase.fixture_paths
+                    ActiveSupport::TestCase.file_fixture_path = Lesli::Engine.root.join("test", "fixtures", "files").to_s
+
+                    # IMPORTANT: attach fixture sets to namespaced models BEFORE loading fixtures
+                    ActiveSupport::TestCase.set_fixture_class(
+                        lesli_users:    "Lesli::User",
+                        lesli_accounts: "Lesli::Account"
+                    )
+                end
+            end
+
             # Load dummy app for unit testing
             # Run tests across all the engines: LESLI_INTEGRATION_TEST=true rails test
             # Run tests for the current engine: rails test
@@ -44,12 +59,6 @@ module LesliTesting
                     ActiveSupport::TestCase.fixture_paths = [ engine_module.root.join("test", "fixtures").to_s ]
                     ActionDispatch::IntegrationTest.fixture_paths = ActiveSupport::TestCase.fixture_paths
                     ActiveSupport::TestCase.file_fixture_path = engine_module.root.join("test", "fixtures", "files").to_s
-
-                    # IMPORTANT: attach fixture sets to namespaced models BEFORE loading fixtures
-                    ActiveSupport::TestCase.set_fixture_class(
-                        lesli_users:    "Lesli::User",
-                        lesli_accounts: "Lesli::Account"
-                    )
 
                     ActiveSupport::TestCase.fixtures :all
                 end
