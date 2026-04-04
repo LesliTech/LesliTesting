@@ -37,24 +37,29 @@ require_relative "helpers/response_integration_helper"
 #
 module LesliTesting
 
-    class IntegrationTester < ActionDispatch::IntegrationTest
-        include ResponseIntegrationHelper
+    if defined?(ActionDispatch::IntegrationTest)
+        class IntegrationTester < ActionDispatch::IntegrationTest
+            include ResponseIntegrationHelper
+        end
     end
 
-    class ViewTester < ActionView::TestCase
-        # We use a hook to include the helpers only when the class is used.
-        # This ensures Lesli core is fully loaded by Rails before we ask for the helpers.
-        def self.inherited(subclass)
-            super
-            subclass.class_eval do
-                include Lesli::HtmlHelper   if defined?(Lesli::HtmlHelper)
-                include Lesli::SystemHelper if defined?(Lesli::SystemHelper)
+    if defined?(ActionView::TestCase)
+        class ViewTester < ActionView::TestCase
+            # We use a hook to include the helpers only when the class is used.
+            # This ensures Lesli core is fully loaded by Rails before we ask for the helpers.
+            def self.inherited(subclass)
+                super
+                subclass.class_eval do
+                    include Lesli::HtmlHelper   if defined?(Lesli::HtmlHelper)
+                    include Lesli::SystemHelper if defined?(Lesli::SystemHelper)
+                end
             end
         end
     end
 
-    # Define the base classes inside the namespace
-    class ModelTester < ActiveSupport::TestCase
-        include ActiveSupport::Testing::TimeHelpers
+    if defined?(ActiveSupport::TestCase)
+        class ModelTester < ActiveSupport::TestCase
+            include ActiveSupport::Testing::TimeHelpers
+        end
     end
 end

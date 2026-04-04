@@ -42,7 +42,7 @@ module LesliTesting
             ])
 
             # Define the limit to allow missing tested code
-            SimpleCov::Formatter::Console.missing_len = 10
+            SimpleCov::Formatter::Console.missing_len = min_coverage
 
             SimpleCov.start "rails" do
                 command_name engine_name

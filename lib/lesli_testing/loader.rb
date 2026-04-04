@@ -40,10 +40,12 @@ require "simplecov-cobertura"
 require "minitest/lesli_testing_plugin"
 require_relative "reporters/cli_reporter"
 
+
 # Force Minitest to know about Lesli Minitest reporter plugin
 unless Minitest.extensions.include?("lesli_testing")
     Minitest.register_plugin("lesli_testing") 
 end
+
 
 # Load test configuration and test helper modules
 require_relative "coverage"
@@ -58,19 +60,24 @@ module LesliTesting
         attr_accessor :engine_module; 
 
         def configure(engine_module = nil, options = {})
+            self.engine_module = engine_module
+            configure_coverage(engine_module, options)
+        end
 
-            engine_module = engine_module ? engine_module.name : "RailsApp"
+        def configure_coverage(engine_module, options)
+
+            engine_name = self.engine_module ? self.engine_module.name : "RailsApp"
 
             return if defined?(SimpleCov) && SimpleCov.running            
 
             # Start Coverage
-            LesliTesting::Coverage.start(engine_module, options[:min_coverage] || 40)
-        end
+            LesliTesting::Coverage.start(engine_name, options[:min_coverage] || 40)
+        end 
 
         def configure_tests()
 
             # Apply Minitest/Reporters/Paths
-            LesliTesting::Config.apply(engine_module)
+            LesliTesting::Config.apply(self.engine_module)
         end
     end
 end
