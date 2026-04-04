@@ -136,41 +136,75 @@ module LesliTesting
                 Termline.br
             end
 
-            def parse_minitest_assertion_messages2 message
-                msg = message.strip
-                return Termline::Style.colorize(" +  #{msg}", :green) if msg.start_with? "Expected:"
-                return Termline::Style.colorize(" -    #{msg}", :red) if msg.start_with? "Actual:"
-                return Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{msg}", :yellow)
-            end
-
             def parse_minitest_assertion_messages(message)
-            msg = message.strip
+                message.to_s.rstrip.lines.map do |line|
+                    msg = line.strip
 
-            case msg
+                    case msg
 
-                # 1. Boolean/Nil Failures (e.g., "Expected true to be nil" or "Expected false to be truthy")
-                when /Expected (.*) to be (nil|truthy|falsey)/, /Expected (.*) to be (.*)/
-                    Termline::Style.colorize(" #{Termline::Style.icon(:info)}  #{msg}", :skyblue)
+                        # 1. Unified Diff Headers
+                        # Covers Minitest diff output like:
+                        # --- expected
+                        # +++ actual
+                        # @@ -1 +1 @@
+                        when /^--- /
+                            Termline::Style.colorize("#{msg}:", :red)
 
-                # 2. Standard Diffs (Expected vs Actual)
-                when /^Expected:?\s+/
-                    Termline::Style.colorize(" #{Termline::Style.icon(:add)}  #{msg}", :green)
+                        when /^\+\+\+ /
+                            Termline::Style.colorize("++#{msg}:", :green)
 
-                when /^Actual:?\s+/
-                    Termline::Style.colorize(" #{Termline::Style.icon(:remove)}    #{msg}", :red)
+                        when /^@@ / 
+                            Termline::Style.colorize("#{msg}", :skyblue)
 
-                # 3. Rails Difference Failures (e.g., "User.count" didn't change by 1)
-                when /"(.*)" didn't change by (.*)/, /actual change was (.*)/
-                    Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{msg}", :yellow)
+                        # 2. Unified Diff Content Lines
+                        # Covers actual changed lines inside the diff, like:
+                        # -[:lesli_support_item_tasks, "lesli_support"]
+                        # +[:lesli_support_items_tasks, "lesli_support"]
+                        # The negative lookahead avoids matching the diff headers above.
+                        when /^-(?!-)/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:remove)}-#{msg}", :red)
 
-                # 4. Collection/Count Failures (e.g., Expected 5 elements, found 2)
-                when /Expected (.*) elements?, found (.*)/, /Expected exactly (.*) nodes/
-                    Termline::Style.colorize(" #{Termline::Style.icon(:list)}  #{msg}", :magenta)
+                        when /^\+(?!\+)/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:add)}+#{msg}", :green)
 
-                # 5. Fallback for custom messages (anything else)
-                else
-                    Termline::Style.colorize(" #{Termline::Style.icon(:arrow_right)}  #{msg}", :gray)
-                end
+                        # 3. Boolean/Nil Failures
+                        # Covers cases like:
+                        # Expected true to be nil
+                        # Expected false to be truthy
+                        # Expected "abc" to be empty
+                        when /Expected (.*) to be (nil|truthy|falsey)/, /Expected (.*) to be (.*)/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:info)}  #{msg}", :skyblue)
+
+                        # 4. Standard Expected vs Actual Output
+                        # Covers simple assertion output like:
+                        # Expected: 1
+                        # Actual: 2
+                        when /^Expected:?\s+/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:add)}  #{msg}", :green)
+
+                        when /^Actual:?\s+/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:remove)}    #{msg}", :red)
+
+                        # 5. Rails Difference Failures
+                        # Covers assertions like:
+                        # "User.count" didn't change by 1
+                        # actual change was 0
+                        when /"(.*)" didn't change by (.*)/, /actual change was (.*)/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{msg}", :yellow)
+
+                        # 6. Collection/Count Failures
+                        # Covers collection assertions like:
+                        # Expected 5 elements, found 2
+                        # Expected exactly 1 nodes
+                        when /Expected (.*) elements?, found (.*)/, /Expected exactly (.*) nodes/
+                            Termline::Style.colorize(" #{Termline::Style.icon(:list)}  #{msg}", :magenta)
+
+                        # 7. Fallback for Custom or Unrecognized Messages
+                        # Covers anything else not matched above.
+                        else 
+                            Termline::Style.colorize(" #{Termline::Style.icon(:arrow_right)}   #{msg}", :gray)
+                    end
+                end.join("\n")
             end
         end
     end
