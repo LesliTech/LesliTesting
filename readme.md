@@ -44,11 +44,26 @@ require "rails/test_help"
 LesliTesting.configure_engine()
 ```
 
-**Run your tests :D**
+**Run your tests D:**
 
 ```shell
+rails test
+
+# or
+
 COVERAGE=true rails test
 ```
+
+**Result :D**
+
+<div align="center">
+    <img
+        style="width:100%;max-width:800px;border-radius:6px;"
+        alt="LesliTesting screenshot" src="./docs/images/screenshot.png" />
+</div>
+
+<br />
+<br />
 
 ### Documentation
 * [website](https://www.lesli.dev/)
