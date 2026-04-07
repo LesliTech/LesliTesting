@@ -17,7 +17,7 @@
 bundle add lesli_testing
 ```
 
-**Include LesliTesting in your app/test/test_helper.rb**
+**Include LesliTesting in your rails/test/test_helper.rb**
 
 ```ruby
 
