@@ -32,27 +32,30 @@ Building a better future, one line of code at a time.
 
 module LesliTesting
     module Config
-        def self.apply(engine_module = nil)
+        class << self
+            def lesli_fixtures()
 
-            if defined?(Lesli)
-                # Load fixtures from Lesli
-                if ActiveSupport::TestCase.respond_to?(:fixture_paths=)
-                    ActiveSupport::TestCase.fixture_paths = [ Lesli::Engine.root.join("test", "fixtures").to_s ]
-                    ActionDispatch::IntegrationTest.fixture_paths = ActiveSupport::TestCase.fixture_paths
-                    ActiveSupport::TestCase.file_fixture_path = Lesli::Engine.root.join("test", "fixtures", "files").to_s
+                if defined?(Lesli)
+                    # Load fixtures from Lesli
+                    if ActiveSupport::TestCase.respond_to?(:fixture_paths=)
+                        ActiveSupport::TestCase.fixture_paths = [ Lesli::Engine.root.join("test", "fixtures").to_s ]
+                        ActionDispatch::IntegrationTest.fixture_paths = ActiveSupport::TestCase.fixture_paths
+                        ActiveSupport::TestCase.file_fixture_path = Lesli::Engine.root.join("test", "fixtures", "files").to_s
 
-                    # IMPORTANT: attach fixture sets to namespaced models BEFORE loading fixtures
-                    ActiveSupport::TestCase.set_fixture_class(
-                        lesli_users:    "Lesli::User",
-                        lesli_accounts: "Lesli::Account"
-                    )
+                        # IMPORTANT: attach fixture sets to namespaced models BEFORE loading fixtures
+                        ActiveSupport::TestCase.set_fixture_class(
+                            lesli_users:    "Lesli::User",
+                            lesli_accounts: "Lesli::Account"
+                        )
+                    end
                 end
             end
 
-            # Load dummy app for unit testing
-            # Run tests across all the engines: LESLI_INTEGRATION_TEST=true rails test
-            # Run tests for the current engine: rails test
-            if engine_module
+            def engine_fixtures(engine_module)
+
+                # Load dummy app for unit testing
+                # Run tests across all the engines: LESLI_INTEGRATION_TEST=true rails test
+                # Run tests for the current engine: rails test
 
                 # Load fixtures from the engine
                 if ActiveSupport::TestCase.respond_to?(:fixture_paths=)

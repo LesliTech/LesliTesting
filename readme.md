@@ -17,7 +17,24 @@
 bundle add lesli_testing
 ```
 
+<br />
+<br />
+
 **Include LesliTesting in your rails/test/test_helper.rb**
+
+```ruby
+
+ENV["RAILS_ENV"] ||= "test"
+require_relative "../config/environment"
+require "rails/test_help"
+
+require "lesli_testing/rails"
+```
+
+<br />
+<br />
+
+**Include LesliTesting in your rails_engine/test/test_helper.rb**
 
 ```ruby
 
@@ -30,7 +47,7 @@ LesliTesting.configure(Lesli::Engine)
 
 
 # initialize coverage
-LesliTesting.configure_coverage({ :min_coverage => 10 })
+LesliTesting.configure_coverage({ :min_coverage => 10, :profile => "engine" })
 
 
 # Loading dummy app
@@ -44,6 +61,9 @@ require "rails/test_help"
 LesliTesting.configure_engine()
 ```
 
+<br />
+<br />
+
 **Run your tests D:**
 
 ```shell
@@ -53,6 +73,9 @@ rails test
 
 COVERAGE=true rails test
 ```
+
+<br />
+<br />
 
 **Result :D**
 

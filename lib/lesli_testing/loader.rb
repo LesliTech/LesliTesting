@@ -30,15 +30,8 @@
 # // · 
 
 
-# Load code coverage tools
-require "simplecov"
-require "simplecov-console"
-require "simplecov-cobertura"
-
-
-# Load test frameworks
+# Load minitest plugin
 require "minitest/lesli_testing_plugin"
-require_relative "reporters/cli_reporter"
 
 
 # Force Minitest to know about Lesli Minitest reporter plugin
@@ -47,11 +40,7 @@ unless Minitest.extensions.include?("lesli_testing")
 end
 
 
-# Load test configuration and test helper modules
-require_relative "coverage"
-require_relative "testers"
-require_relative "config"
-
+# Lesli testing builder
 module LesliTesting
     class Error < StandardError; end
 
@@ -65,18 +54,31 @@ module LesliTesting
 
         def configure_coverage(options)
 
+            require_relative "coverage"
+
             engine_name = self.engine_module ? self.engine_module.name : "RailsApp"
 
             return if defined?(SimpleCov) && SimpleCov.running            
 
             # Start Coverage
-            LesliTesting::Coverage.start(engine_name, options[:min_coverage] || 40)
+            LesliTesting::Coverage.start(
+                engine_name, 
+                profile: options[:profile] || "app",
+                missing_len: options[:missing_len] || 25,
+                min_coverage: options[:min_coverage] || 40
+            )
         end 
 
-        def configure_engine()
+        def configure_tests()
+
+            # Load test configuration and test helper modules
+            require_relative "testers"
+            require_relative "fixtures"
+
+            LesliTesting::Config.lesli_fixtures()
 
             # Apply Minitest/Reporters/Paths
-            LesliTesting::Config.apply(self.engine_module)
+            LesliTesting::Config.engine_fixtures(self.engine_module) if self.engine_module
         end
     end
 end

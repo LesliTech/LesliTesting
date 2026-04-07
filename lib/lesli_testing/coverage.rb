@@ -30,43 +30,34 @@ Building a better future, one line of code at a time.
 // · 
 =end
 
+# Load code coverage tools
+require "simplecov"
+require "simplecov-console"
+require "simplecov-cobertura"
+require_relative "simplecov/profiles"
+
+
 module LesliTesting
     module Coverage
-        def self.start(engine_name = "Lesli", min_coverage = 40)
+        def self.start(engine_name = "Lesli", profile:"rails", min_coverage:90, missing_len:25)
             return unless ENV["COVERAGE"]
 
             # Add coverage formatters 
             SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
                 SimpleCov::Formatter::CoberturaFormatter,
+                SimpleCov::Formatter::HTMLFormatter,
                 SimpleCov::Formatter::Console
             ])
 
             # Define the limit to allow missing tested code
-            SimpleCov::Formatter::Console.missing_len = min_coverage
+            SimpleCov::Formatter::Console.missing_len = missing_len
 
-            SimpleCov.start "rails" do
-                command_name engine_name
+            SimpleCov.start "lesli_rails_#{profile}" do
 
-                # Standard filters for all Lesli engines
-                add_filter [
-                    "/app/assets", 
-                    "/app/jobs", 
-                    "/config", 
-                    "/docs",
-                    "/db", 
-                    "/test", 
-                    "/test/dummy/",
-                    "/lib/tasks", 
-                    "/vendor"
-                ]
-
-                # Add your groups
-                add_group "Models", "app/models"
-                add_group "Services", "app/services"
-                add_group "Controllers", "app/controllers"
+                command_name(engine_name)
 
                 # Minimum expected coverage percentage
-                minimum_coverage min_coverage
+                minimum_coverage(min_coverage)
             end
         end
     end
