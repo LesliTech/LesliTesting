@@ -20,7 +20,6 @@ bundle add lesli_testing
 ```
 
 <br />
-<br />
 
 **Include LesliTesting in your test_helper.rb file**
 
@@ -45,7 +44,6 @@ LesliTesting.gem("LesliDate")
 ```
 
 <br />
-<br />
 
 **Run your tests D:**
 
@@ -62,7 +60,6 @@ COVERAGE=true CI=true rails test
 ```
 
 <br />
-<br />
 
 **Result :D**
 
@@ -72,7 +69,6 @@ COVERAGE=true CI=true rails test
         alt="LesliTesting screenshot" src="./docs/images/screenshot.png" />
 </div>
 
-<br />
 <br />
 
 ### Options
@@ -94,7 +90,6 @@ LesliTesting.configure(LesliShield, {
 ```
 
 <br />
-<br />
 
 ### Documentation
 * [website](https://www.lesli.dev/)
@@ -107,6 +102,7 @@ LesliTesting.configure(LesliShield, {
 * [Email: hello@lesli.tech](hello@lesli.tech)
 * [Website: https://www.lesli.tech](https://www.lesli.tech)
 
+<br />
 
 ### License
 -------
@@ -125,7 +121,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see http://www.gnu.org/licenses/.
 
-<br />
 <hr />
 <br />
 <br />
@@ -137,5 +132,4 @@ along with this program. If not, see http://www.gnu.org/licenses/.
     </h4>
 </div>
 
-<br />
 <br />
