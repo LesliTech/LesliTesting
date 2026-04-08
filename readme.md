@@ -10,6 +10,8 @@
 
 ### Quick start
 
+<br />
+
 
 **Install LesliTesting gem**
 
@@ -20,45 +22,26 @@ bundle add lesli_testing
 <br />
 <br />
 
-**Include LesliTesting in your rails/test/test_helper.rb**
+**Include LesliTesting in your test_helper.rb file**
 
 ```ruby
-
 ENV["RAILS_ENV"] ||= "test"
-require_relative "../config/environment"
-require "rails/test_help"
-
-require "lesli_testing/rails"
-```
-
-<br />
-<br />
-
-**Include LesliTesting in your rails_engine/test/test_helper.rb**
-
-```ruby
-
-# load lesli testing tools
-require "lesli_testing/loader"
 
 
-# register engine for testing
-LesliTesting.configure(Lesli::Engine)
+# Load LesliTesting tools
+require "lesli_testing"
 
 
-# initialize coverage
-LesliTesting.configure_coverage({ :min_coverage => 10, :profile => "engine" })
+# Configure leslitesting tools for a rails engine
+LesliTesting.engine("LesliShield")
 
 
-# Loading dummy app
-require_relative "../test/dummy/config/environment"
-ActiveRecord::Migrator.migrations_paths = [ File.expand_path("../test/dummy/db/migrate", __dir__) ]
-ActiveRecord::Migrator.migrations_paths << File.expand_path("../db/migrate", __dir__)
-require "rails/test_help"
+# Configure lesli testing tools for a rails app
+LesliTesting.app("LesliBuilder")
 
 
-# configure tests
-LesliTesting.configure_engine()
+# # Configure leslitesting tools for a ruby gem
+LesliTesting.gem("LesliDate")
 ```
 
 <br />
@@ -72,6 +55,10 @@ rails test
 # or
 
 COVERAGE=true rails test
+
+# or run like github actions
+
+COVERAGE=true CI=true rails test
 ```
 
 <br />
@@ -84,6 +71,27 @@ COVERAGE=true rails test
         style="width:100%;max-width:800px;border-radius:6px;"
         alt="LesliTesting screenshot" src="./docs/images/screenshot.png" />
 </div>
+
+<br />
+<br />
+
+### Options
+
+The following options can be used to customize coverage behavior in `LesliTesting`.
+
+| Option                  | Type    | Default | Description                                |
+| ----------------------- | ------- | ------: | ------------------------------------------ |
+| `coverage_missing_len`  | Integer |    `25` | Minimum width for missing coverage output. |
+| `coverage_min_coverage` | Integer |    `40` | Minimum expected coverage percentage.      |
+
+**Example:**
+
+```ruby
+LesliTesting.configure(LesliShield, {
+    coverage_missing_len: 30,
+    coverage_min_coverage: 80
+})
+```
 
 <br />
 <br />
@@ -123,10 +131,10 @@ along with this program. If not, see http://www.gnu.org/licenses/.
 <br />
 
 <div align="center" class="has-text-centered">
-    <img width="200" alt="Lesli logo" src="https://cdn.lesli.tech/lesli/brand/app-logo.svg" />
-    <h3 align="center" class="mt-0">
+    <img width="80" alt="Lesli logo" src="https://cdn.lesli.tech/lesli/brand/app-icon.svg" />
+    <h4 align="center" class="mt-0">
         The Open-Source SaaS Development Framework for Ruby on Rails.
-    </h3>
+    </h4>
 </div>
 
 <br />

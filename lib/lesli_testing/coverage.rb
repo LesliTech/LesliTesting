@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 =begin
 
 Lesli
@@ -30,8 +32,10 @@ Building a better future, one line of code at a time.
 // · 
 =end
 
+
 # Load code coverage tools
 require "simplecov"
+require "simplecov-html"
 require "simplecov-console"
 require "simplecov-cobertura"
 require_relative "simplecov/profiles"
@@ -39,25 +43,27 @@ require_relative "simplecov/profiles"
 
 module LesliTesting
     module Coverage
-        def self.start(engine_name = "Lesli", profile:"rails", min_coverage:90, missing_len:25)
-            return unless ENV["COVERAGE"]
+        class << self
 
-            # Add coverage formatters 
-            SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
-                SimpleCov::Formatter::CoberturaFormatter,
-                SimpleCov::Formatter::HTMLFormatter,
-                SimpleCov::Formatter::Console
-            ])
+            def start(app_name, profile:"rails", min_coverage:90, missing_len:25)
 
-            # Define the limit to allow missing tested code
-            SimpleCov::Formatter::Console.missing_len = missing_len
+                # Add coverage formatters 
+                SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
+                    SimpleCov::Formatter::CoberturaFormatter,
+                    SimpleCov::Formatter::HTMLFormatter,
+                    SimpleCov::Formatter::Console
+                ])
 
-            SimpleCov.start "lesli_rails_#{profile}" do
+                # Define the limit to allow missing tested code
+                SimpleCov::Formatter::Console.missing_len = missing_len
 
-                command_name(engine_name)
+                SimpleCov.start "lesli_rails_#{profile}" do
 
-                # Minimum expected coverage percentage
-                minimum_coverage(min_coverage)
+                    command_name(app_name)
+
+                    # Minimum expected coverage percentage
+                    minimum_coverage(min_coverage)
+                end
             end
         end
     end
