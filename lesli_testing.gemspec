@@ -13,7 +13,7 @@ Gem::Specification.new do |spec|
     spec.summary     = "Shared testing and coverage configuration for the Lesli Platform."
     spec.description = <<~DESC
         Core testing utilities for the Lesli Platform, providing standardized Minitest configuration, 
-        coverage setup, and shared testing conventions across engines and applications.
+        coverage setup, and shared testing conventions across applications, engines and gems.
     DESC
 
     # Prevent pushing this gem to RubyGems.org. To allow pushes either set the "allowed_push_host"
@@ -35,15 +35,24 @@ Gem::Specification.new do |spec|
     spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
     spec.require_paths = ["lib"]
 
+    
+    # Termline is a lightweight Ruby gem for printing terminal 
+    # messages with colors, icons, and semantic log levels.
+    # https://github.com/LesliTech/Termline
+    spec.add_dependency "termline", "~> 1.1.0"
 
-    # Until a patch for Rails 8.1.2 (or higher) is released specifically addressing the Minitest 6 boot sequence, the most stable way to run your tests is:
-    #     Keep Minitest at ~> 5.0 in your Gemfile.
-    #     Use the standard command: bin/rails test.
+    # minitest provides a complete suite of testing facilities 
+    # supporting TDD, BDD, and benchmarking.
+    # https://github.com/minitest/minitest
     spec.add_dependency "minitest", "~> 6.0.0"
 
     # Code coverage
     # https://github.com/simplecov-ruby/simplecov
     spec.add_dependency "simplecov", "~> 0.22.0"
+
+    # Default HTML formatter for SimpleCov code coverage tool for ruby 
+    # https://github.com/simplecov-ruby/simplecov-html
+    spec.add_dependency "simplecov-html", "~> 0.13.2"
 
     # Code coverage stats in the console
     # https://github.com/chetan/simplecov-console
@@ -52,20 +61,5 @@ Gem::Specification.new do |spec|
     # Produces Cobertura XML formatted output from SimpleCov
     # https://github.com/jessebs/simplecov-cobertura
     spec.add_dependency "simplecov-cobertura", "~> 3.1.0"
-
-    # Brakeman detects security vulnerabilities in Ruby on Rails applications via static analysis.
-    # https://github.com/presidentbeef/brakeman
-    spec.add_dependency "brakeman", "~> 8.0.0"
-
-    # When mail is sent from your application, Letter Opener will 
-    # open a preview in the browser instead of sending.
-    # https://github.com/ryanb/letter_opener
-    spec.add_dependency "letter_opener", "~> 1.10.0"
-
-
-    # Termline is a lightweight Ruby gem for printing terminal 
-    # messages with colors, icons, and semantic log levels.
-    # https://github.com/LesliTech/Termline
-    spec.add_dependency "termline", "~> 1.1.0"
 
 end

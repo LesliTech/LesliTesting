@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
 module LesliTesting
-  VERSION = "1.3.0"
-  BUILD = "1775525290"
+  VERSION = "1.3.1"
+  BUILD = "1776563517"
 end
