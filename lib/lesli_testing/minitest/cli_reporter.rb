@@ -156,7 +156,6 @@ module LesliTesting
                     if failure.is_a?(Minitest::Assertion)
                         result.failure.message.to_s.lines.each do |message|
                             puts(parse_minitest_assertion_messages(message))
-                            #puts(parse_minitest_assertion_messages2(message))
                         end
                     end
                 end
