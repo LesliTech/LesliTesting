@@ -109,7 +109,7 @@ module LesliTesting
         def configure_gems
             return if @tools_loaded
 
-            #require "minitest"
+            require "minitest"
 
             # Load minitest plugin
             require "minitest/lesli_testing_plugin"
