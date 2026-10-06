@@ -117,4 +117,4 @@ LesliTesting/
 | `test/demo_test.rb` | Intentional failures for visually inspecting reporter output. |
 | `test/performance_test.rb` | Lightweight reporter execution tests. |
 
-See [Testing tools](./tools.md) for the behavior exposed by these components.
+See [Testing tools](/gems/testing/about/tools) for the behavior exposed by these components.

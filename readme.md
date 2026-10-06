@@ -92,12 +92,12 @@ Set `QUIET=true` to hide individual passing-test lines while retaining the summa
 
 ## Guides
 
-- [Installation and configuration](./docs/installation.md)
-- [Testing Rails applications](./docs/applications.md)
-- [Testing Rails engines](./docs/engines.md)
-- [Testing Ruby gems](./docs/gems.md)
-- [Reporter, coverage, fixtures, and test helpers](./docs/tools.md)
-- [Recommended project and gem structure](./docs/structure.md)
+- [Installation and configuration](https://www.lesli.dev/gems/testing/about/installation)
+- [Testing Rails applications](https://www.lesli.dev/gems/testing/testing/applications)
+- [Testing Rails engines](https://www.lesli.dev/gems/testing/testing/engines)
+- [Testing Ruby gems](https://www.lesli.dev/gems/testing/testing/gems)
+- [Reporter, coverage, fixtures, and test helpers](https://www.lesli.dev/gems/testing/about/tools)
+- [Recommended project and gem structure](https://www.lesli.dev/gems/testing/about/structure)
 
 <br />
 

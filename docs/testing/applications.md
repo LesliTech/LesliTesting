@@ -75,7 +75,7 @@ class AccountsControllerTest < LesliTesting::IntegrationTester
 end
 ```
 
-See [Testing tools](./tools.md) for the response helpers and fixture behavior.
+See [Testing tools](/gems/testing/about/tools) for the response helpers and fixture behavior.
 
 ## Run application tests
 

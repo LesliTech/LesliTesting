@@ -102,6 +102,6 @@ Rails autoloading means application models and controllers can still be covered 
 
 ## Next steps
 
-- [Configure a Rails application](./applications.md)
-- [Configure a Rails engine](./engines.md)
-- [Configure a Ruby gem](./gems.md)
+- [Configure a Rails application](/gems/testing/testing/applications)
+- [Configure a Rails engine](/gems/testing/testing/engines)
+- [Configure a Ruby gem](/gems/testing/testing/gems)
