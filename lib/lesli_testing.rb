@@ -35,6 +35,13 @@ Building a better future, one line of code at a time.
 
 require_relative "lesli_testing/version"
 
+begin
+    require "rails/engine"
+    require_relative "lesli_testing/engine"
+rescue LoadError
+    # Rails is optional when LesliTesting is used by a standalone Ruby gem.
+end
+
 
 module LesliTesting
     class Error < StandardError; end

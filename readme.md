@@ -74,7 +74,15 @@ LesliTesting.app("LesliBuilder")       # Rails application
 # LesliTesting.gem("LesliDate")       # Standalone Ruby gem
 ```
 
-Load LesliTesting before the code under test when coverage is enabled. Rails projects should load `rails/test_help` before configuration when they use the shared Rails test classes.
+Load LesliTesting before the code under test when coverage is enabled. Engine suites that use the shared Rails test classes should run through `bundle exec rails test` or `bundle exec rake app:test`.
+
+Rails engines should keep a complete generated dummy application and verify eager loading locally before pushing:
+
+```shell
+CI=true bundle exec rails test
+```
+
+LesliTesting does not provide an engine's runtime dependencies. Declare dependencies such as `lesli` explicitly in the engine gemspec and Gemfile so local and CI dependency resolution match.
 
 Run the suite normally or enable coverage with `COVERAGE`:
 

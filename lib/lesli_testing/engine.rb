@@ -37,8 +37,7 @@ module LesliTesting
             # Only run this if we are in the test environment
             unless Rails.env.production?
 
-                # 1. Define the dependencies you want to automatically include
-                # You can add more gems to this list as your ecosystem grows
+                # Lesli provides the shared schema required by every engine.
                 dependencies = ["Lesli"]
 
                 dependencies.each do |gem_name|
@@ -51,16 +50,16 @@ module LesliTesting
 
                             # Append to the main app's migration paths if the directory exists
                             if Dir.exist?(migration_path)
-                                app.config.paths["db/migrate"] << migration_path
+                                registered_paths = app.config.paths["db/migrate"].expanded
+                                unless registered_paths.include?(migration_path)
+                                    app.config.paths["db/migrate"] << migration_path
+                                end
                             end
                         end
                     rescue StandardError => e
                         puts "LesliTesting: Could not load migrations for #{gem_name}: #{e.message}"
                     end
                 end
-
-                # 2. Clean up duplicates
-                app.config.paths["db/migrate"].uniq!
             end
         end
     end
