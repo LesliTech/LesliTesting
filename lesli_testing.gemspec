@@ -48,7 +48,7 @@ Gem::Specification.new do |spec|
 
     # Code coverage
     # https://github.com/simplecov-ruby/simplecov
-    spec.add_dependency "simplecov", "~> 0.22.0"
+    spec.add_dependency "simplecov", "~> 1.3.2"
 
     # Default HTML formatter for SimpleCov code coverage tool for ruby 
     # https://github.com/simplecov-ruby/simplecov-html
@@ -60,6 +60,6 @@ Gem::Specification.new do |spec|
 
     # Produces Cobertura XML formatted output from SimpleCov
     # https://github.com/jessebs/simplecov-cobertura
-    spec.add_dependency "simplecov-cobertura", "~> 3.1.0"
+    spec.add_dependency "simplecov-cobertura", "~> 4.0.0"
 
 end
