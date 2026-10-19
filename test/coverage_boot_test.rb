@@ -38,4 +38,31 @@ class CoverageBootTest < Minitest::Test
                 "Expected Cobertura report at #{coverage_dir}/coverage.xml"
         end
     end
+
+    def test_minimum_coverage_threshold_fails_the_process
+        Dir.mktmpdir("lesli-testing-threshold") do |coverage_dir|
+            script = <<~RUBY
+                require "lesli_testing"
+
+                LesliTesting.gem("CoverageThreshold", coverage_min_coverage: 100)
+                SimpleCov.coverage_dir(ARGV.fetch(0))
+            RUBY
+
+            stdout, stderr, status = Open3.capture3(
+                { "COVERAGE" => "true" },
+                RbConfig.ruby,
+                "-I#{LIB_PATH}",
+                "-e",
+                script,
+                coverage_dir,
+                chdir: PROJECT_ROOT
+            )
+            output = [stdout, stderr].join("\n")
+
+            refute status.success?, output
+            assert_match(/below the expected minimum coverage/i, output)
+            assert File.file?(File.join(coverage_dir, "coverage.xml")),
+                "Expected a report even when the threshold fails"
+        end
+    end
 end

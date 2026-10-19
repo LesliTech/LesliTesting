@@ -27,6 +27,7 @@ class InitializationTest < Minitest::Test
             end
 
             abort "Loaded too early: \#{loaded.join(', ')}" unless loaded.empty?
+            abort "Coverage started without COVERAGE" if defined?(::Coverage) && ::Coverage.running?
         RUBY
 
         assert_child_success(script)
