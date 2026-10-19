@@ -120,9 +120,9 @@ LesliTesting/
 | `lib/lesli_testing/minitest/cli_reporter.rb` | Per-test output, summaries, and failure formatting. |
 | `lib/lesli_testing/coverage.rb` | Starts SimpleCov and configures its formatters and threshold. |
 | `lib/lesli_testing/simplecov/profiles.rb` | Application, engine, and gem coverage profiles. |
-| `lib/lesli_testing/engine.rb` | Rails initializer source for adding Lesli migration paths when this optional file is loaded. |
+| `lib/lesli_testing/engine.rb` | Rails initializer that applies the configured dummy, owner, and shared engine migration paths. |
 | `lib/lesli_testing/testers.rb` | Defines shared Rails test base classes through ActiveSupport load hooks. |
-| `lib/lesli_testing/fixtures.rb` | Applies shared Lesli fixtures after `ActiveSupport::TestCase` loads. |
+| `lib/lesli_testing/fixtures.rb` | Applies owner and shared fixtures through Rails load hooks and de-duplicates migration paths. |
 | `lib/lesli_testing/helpers/response_integration_helper.rb` | JSON response helpers loaded only with the Rails integration test base. |
 | `test/demo_test.rb` | Intentional failures for visually inspecting reporter output. |
 | `test/performance_test.rb` | Lightweight reporter execution tests. |

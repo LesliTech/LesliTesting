@@ -122,15 +122,22 @@ class NavigationHelperTest < LesliTesting::ViewTester
 end
 ```
 
-## Lesli fixtures
+## Engine fixtures and migrations
 
-When `Lesli` is loaded, LesliTesting registers the Lesli engine's fixture directory and file-fixture directory with `ActiveSupport::TestCase`. It also maps these fixture sets to their namespaced models:
+For the engine profile, LesliTesting waits for Rails to load and then resolves the owner from the name passed to `LesliTesting.engine`. With a conventional engine layout it automatically registers:
+
+- the owner's `test/fixtures` and `test/fixtures/files` directories;
+- shared fixtures from `Lesli`;
+- the dummy application's, owner engine's, and shared Lesli migration directories;
+- all fixtures on `ActiveSupport::TestCase` and their paths on integration tests.
+
+It also maps the shared Lesli fixture sets to their namespaced models:
 
 | Fixture set | Model |
 | --- | --- |
 | `lesli_users` | `Lesli::User` |
 | `lesli_accounts` | `Lesli::Account` |
 
-The fixture integration is registered during configuration and applied when `ActiveSupport::TestCase` becomes available. This allows coverage to start before Rails without losing the shared fixture setup.
+Fixture paths and classes are applied through Rails load hooks. Migration paths are added during the dummy application's boot and again when Active Record becomes available; both operations preserve and de-duplicate existing paths. This allows coverage to start before Rails without losing test data configuration.
 
-Engine-specific fixture paths remain the responsibility of the engine test helper. See [Testing Rails engines](/gems/testing/testing/engines) for an example.
+Custom owners, paths, shared engines, fixture sets, model mappings, and migration paths can be supplied through the `fixtures:` and `migrations:` options. See [Testing Rails engines](/gems/testing/testing/engines) for the complete configuration.

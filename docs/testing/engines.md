@@ -95,23 +95,48 @@ LesliTesting.engine(
 
 require_relative "dummy/config/environment"
 require "rails/test_help"
-
-ActiveRecord::Migrator.migrations_paths = [
-  File.expand_path("dummy/db/migrate", __dir__),
-  File.expand_path("../db/migrate", __dir__)
-]
-
-if ActiveSupport::TestCase.respond_to?(:fixture_paths=)
-  fixture_path = File.expand_path("fixtures", __dir__)
-
-  ActiveSupport::TestCase.fixture_paths = [fixture_path]
-  ActionDispatch::IntegrationTest.fixture_paths = [fixture_path]
-  ActiveSupport::TestCase.file_fixture_path = File.join(fixture_path, "files")
-  ActiveSupport::TestCase.fixtures :all
-end
 ```
 
-The LesliTesting Rails engine adds the Lesli migration directory without duplicating an existing path. The test helper still owns the dummy application's and current engine's migration paths.
+After the dummy application boots, LesliTesting resolves `MyEngine::Engine` and configures:
+
+- `test/fixtures` and `test/fixtures/files` from the current engine;
+- the shared fixture directory and model mappings from `Lesli`;
+- fixtures for `ActiveSupport::TestCase` and `ActionDispatch::IntegrationTest`;
+- migration directories from the dummy application, current engine, and `Lesli`.
+
+Paths already registered by Rails or another engine are preserved and de-duplicated.
+
+Use declarative options when an engine needs custom fixture sets, mappings, shared engines, or paths:
+
+```ruby
+LesliTesting.engine(
+  "MyEngine",
+  coverage_min_coverage: 90,
+  fixtures: {
+    # Defaults to "MyEngine" and is resolved after Rails boots.
+    owner: "MyEngine",
+    path: File.expand_path("custom/fixtures", __dir__),
+    file_path: File.expand_path("custom/fixtures/files", __dir__),
+    shared: ["Lesli", "AnotherEngine"],
+    shared_paths: [File.expand_path("shared/fixtures", __dir__)],
+    sets: [:lesli_accounts, :my_engine_records],
+    classes: {
+      my_engine_records: "MyEngine::Record"
+    }
+  },
+  migrations: {
+    # Dummy and owner migrations are included by default.
+    include_dummy: true,
+    include_owner: true,
+    shared: ["Lesli", "AnotherEngine"],
+    paths: [File.expand_path("custom/migrate", __dir__)]
+  }
+)
+```
+
+Omit these options for the conventional structure. Use `fixtures: false` or `migrations: false` only when the engine intentionally manages that integration itself. The default fixture set is `:all`.
+
+An engine exposed through `fixtures[:shared]` must include its fixture files in the built gem. Lesli packages `test/fixtures/**/*` for this purpose; apply the same rule to another engine before using it as a shared fixture source in CI.
 
 Tests may use the shared base classes with this load order:
 
@@ -171,7 +196,7 @@ Do not fix an eager-loading failure by setting `config.eager_load = false` in CI
 | `uninitialized constant MyEngine::...::ApplicationRecord` | A namespaced model expects the engine's conventional base record, but its file was removed or misnamed. | Restore `MyEngine::ApplicationRecord` in the path Zeitwerk expects. Keep framework-specific base records separate when they have different responsibilities. |
 | `uninitialized constant ApplicationController` while loading Devise | The dummy host does not define the standard top-level controller. | Restore `test/dummy/app/controllers/application_controller.rb`. |
 | A published dependency fails but a workspace run passes | Local Bundler resolution differs from CI, or the fix has not been released. | Compare `bundle info`, publish/reference the fixed version, and update `Gemfile.lock`. |
-| Duplicate or invalid migration paths | The same dependency path is registered more than once, or a Rails paths object is treated like an Array. | Let LesliTesting de-duplicate Lesli's migration path and configure only the dummy/current engine paths explicitly. |
+| Duplicate or invalid migration paths | The same dependency path is registered more than once, or a Rails paths object is treated like an Array. | Remove manual migration configuration and let LesliTesting register and de-duplicate dummy, owner, and shared engine paths. |
 | `LesliTesting::ViewTester` or another shared tester is missing | The test file was executed directly with Ruby before Rails loaded its testing framework. | Run engine tests with `bundle exec rails test` or `bundle exec rake app:test`. |
 
 When diagnosing a CI-only boot failure, reproduce it locally with `CI=true`, read the first application or gem file in the stack trace, and fix that constant before chasing later framework frames.

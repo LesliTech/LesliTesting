@@ -33,34 +33,7 @@ Building a better future, one line of code at a time.
 module LesliTesting
     class Engine < ::Rails::Engine
         initializer "lesli_testing.load_required_migrations", after: :load_config_initializers do |app|
-
-            # Only run this if we are in the test environment
-            unless Rails.env.production?
-
-                # Lesli provides the shared schema required by every engine.
-                dependencies = ["Lesli"]
-
-                dependencies.each do |gem_name|
-                    begin
-                        # Find the constant for the gem's Engine
-                        gem_engine = "#{gem_name}::Engine".safe_constantize
-
-                        if gem_engine
-                            migration_path = gem_engine.root.join("db/migrate").to_s
-
-                            # Append to the main app's migration paths if the directory exists
-                            if Dir.exist?(migration_path)
-                                registered_paths = app.config.paths["db/migrate"].expanded
-                                unless registered_paths.include?(migration_path)
-                                    app.config.paths["db/migrate"] << migration_path
-                                end
-                            end
-                        end
-                    rescue StandardError => e
-                        puts "LesliTesting: Could not load migrations for #{gem_name}: #{e.message}"
-                    end
-                end
-            end
+            LesliTesting::Fixtures.configure_migration_paths(app)
         end
     end
 end

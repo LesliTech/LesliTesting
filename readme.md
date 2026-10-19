@@ -52,7 +52,7 @@ It standardizes Minitest output, SimpleCov profiles, coverage reports, and fixtu
 - SimpleCov console and Cobertura reports
 - Configurable minimum coverage thresholds
 - Shared base classes for integration, model, and view tests
-- Automatic access to Lesli fixtures in Rails test cases
+- Automatic engine, shared Lesli fixture, and migration paths
 
 <br />
 
@@ -83,6 +83,8 @@ CI=true bundle exec rails test
 ```
 
 LesliTesting does not provide an engine's runtime dependencies. Declare dependencies such as `lesli` explicitly in the engine gemspec and Gemfile so local and CI dependency resolution match.
+
+For Rails engines, the engine name is also used to discover its `Engine` class after the dummy application boots. LesliTesting then configures the engine and shared Lesli fixtures, fixture classes, and migration paths without duplicating that setup in `test_helper.rb`.
 
 Run the suite normally or enable coverage with `COVERAGE`:
 

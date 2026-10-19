@@ -111,7 +111,9 @@ module LesliTesting
 
             require_relative "rails_integration"
             LesliTesting::RailsIntegration.install!(
-                profile: self.options[:coverage_profile]
+                profile: self.options[:coverage_profile],
+                project_name: self.app_name,
+                options: self.options
             )
         end
     end
