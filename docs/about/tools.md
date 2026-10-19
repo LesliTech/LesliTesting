@@ -35,7 +35,6 @@ Every coverage run produces:
 | Format | Output |
 | --- | --- |
 | Console | Summary in the test command output |
-| HTML | `coverage/index.html` |
 | Cobertura | `coverage/coverage.xml` |
 
 The minimum line-coverage threshold defaults to 90 percent. Configure it for a suite with `coverage_min_coverage`:
@@ -64,7 +63,7 @@ Set it to `0` to remove the limit.
 
 | Variable | Behavior |
 | --- | --- |
-| `COVERAGE` | Enables SimpleCov and all three coverage formatters. |
+| `COVERAGE` | Enables SimpleCov with the console and Cobertura formatters. |
 | `QUIET` | Hides individual test-result lines from the custom reporter. |
 
 `COVERAGE` and `QUIET` are enabled by presence. Do not set them to `false`; leave them unset when the behavior should be disabled.

@@ -90,7 +90,7 @@ module LesliTesting
         def configure_coverage()
 
             return unless ENV["COVERAGE"]
-            return if defined?(SimpleCov) && SimpleCov.running            
+            return if defined?(SimpleCov) && SimpleCov.coverage_running?
 
             # Start Coverage
             LesliTesting::Coverage.start(

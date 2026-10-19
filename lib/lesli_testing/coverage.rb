@@ -35,7 +35,6 @@ Building a better future, one line of code at a time.
 
 # Load code coverage tools
 require "simplecov"
-require "simplecov-html"
 require "simplecov-console"
 require "simplecov-cobertura"
 require_relative "simplecov/profiles"
@@ -50,7 +49,6 @@ module LesliTesting
                 # Add coverage formatters 
                 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
                     SimpleCov::Formatter::CoberturaFormatter,
-                    SimpleCov::Formatter::HTMLFormatter,
                     SimpleCov::Formatter::Console
                 ])
 

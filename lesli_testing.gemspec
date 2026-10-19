@@ -50,10 +50,6 @@ Gem::Specification.new do |spec|
     # https://github.com/simplecov-ruby/simplecov
     spec.add_dependency "simplecov", "~> 1.3.2"
 
-    # Default HTML formatter for SimpleCov code coverage tool for ruby 
-    # https://github.com/simplecov-ruby/simplecov-html
-    spec.add_dependency "simplecov-html", "~> 0.13.2"
-
     # Code coverage stats in the console
     # https://github.com/chetan/simplecov-console
     spec.add_dependency "simplecov-console", "~> 0.9.0"
