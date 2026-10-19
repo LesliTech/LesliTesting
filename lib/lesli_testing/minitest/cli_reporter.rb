@@ -206,10 +206,10 @@ module LesliTesting
                         # Covers simple assertion output like:
                         # Expected: 1
                         # Actual: 2
-                        when /^Expected:?\s+/
+                        when /^Expected:\s+/
                             Termline::Style.colorize(" #{Termline::Style.icon(:add)}  #{msg}", :green)
 
-                        when /^Actual:?\s+/
+                        when /^Actual:\s+/
                             Termline::Style.colorize(" #{Termline::Style.icon(:remove)}    #{msg}", :red)
 
                         # 5. Rails Difference Failures
@@ -224,12 +224,12 @@ module LesliTesting
                         # Expected 5 elements, found 2
                         # Expected exactly 1 nodes
                         when /Expected (.*) elements?, found (.*)/, /Expected exactly (.*) nodes/
-                            Termline::Style.colorize(" #{Termline::Style.icon(:list)}  #{msg}", :magenta)
+                            Termline::Style.colorize(" #{Termline::Style.icon(:info)}  #{msg}", :blue)
 
                         # 7. Fallback for Custom or Unrecognized Messages
                         # Covers anything else not matched above.
                         else 
-                            Termline::Style.colorize(" #{Termline::Style.icon(:arrow_right)}   #{msg}", :gray)
+                            Termline::Style.colorize(" #{Termline::Style.icon(:debug)}   #{msg}", :gray)
                     end
                 end.join("\n")
             end
