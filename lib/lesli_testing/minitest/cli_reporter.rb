@@ -32,9 +32,12 @@ Building a better future, one line of code at a time.
 
 module LesliTesting
     module Reporters
-        class CliReporter < Minitest::StatisticsReporter
+        # Inheriting from SummaryReporter is important even though LesliTesting
+        # renders its own summary. Minitest uses this type to detect a filtered
+        # run in which no tests matched and return a non-zero exit status.
+        class CliReporter < Minitest::SummaryReporter
             def start
-                super
+                run_statistics_reporter(:start)
 
                 Termline.br
 
@@ -86,7 +89,7 @@ module LesliTesting
             end
 
             def report
-                super
+                run_statistics_reporter(:report)
 
                 total_tests = count.to_i
                 total_failures = failures.to_i
@@ -97,7 +100,12 @@ module LesliTesting
 
                 passed = total_tests - total_failures - total_errors - total_skips
                 success_rate = total_tests.zero? ? 0 : ((passed.to_f / total_tests) * 100).round(1)
-                status = (total_failures.zero? && total_errors.zero?) ? "PASS" : "FAIL"
+                empty_filtered_run = total_tests.zero? && options[:include]
+                status = if empty_filtered_run || total_failures.positive? || total_errors.positive?
+                    "FAIL"
+                else
+                    "PASS"
+                end
 
                 Termline.br 2
 
@@ -119,7 +127,12 @@ module LesliTesting
 
                 Termline.br 2
 
-                if status == "PASS"
+                if empty_filtered_run
+                    Termline.danger(
+                        "No tests matched filter: #{options[:include]}",
+                        tag: "FAILURE"
+                    )
+                elsif status == "PASS"
                     Termline.success("Test suite passed")
                 else
                     Termline.danger("Test suite failed", tag:'FAILURE')
@@ -132,6 +145,15 @@ module LesliTesting
             end
 
             private
+
+            # Skip SummaryReporter's default terminal output while reusing the
+            # statistics lifecycle implemented by its parent class.
+            def run_statistics_reporter(method_name)
+                Minitest::StatisticsReporter
+                    .instance_method(method_name)
+                    .bind(self)
+                    .call
+            end
 
             def print_failure_details
                 failed_results = Array(results).select { |result| result.failure }
