@@ -57,6 +57,10 @@ module LesliTesting
             configure(name, options.merge(coverage_profile: "gem"))
         end
 
+        def profile
+            @options && @options[:coverage_profile]
+        end
+
         private
 
         def options

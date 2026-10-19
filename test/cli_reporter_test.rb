@@ -55,6 +55,29 @@ class CliReporterTest < Minitest::Test
         refute_includes @output.string, "[]"
     end
 
+    def test_application_header_includes_database_guidance
+        output = render_header("app", "ExampleApp")
+
+        assert_includes output, "Running tests for ExampleApp (Rails application)..."
+        assert_includes output, "clean database"
+        assert_includes output, "rake dev:db:reset"
+    end
+
+    def test_engine_header_uses_rails_test_application_guidance
+        output = render_header("engine", "ExampleEngine")
+
+        assert_includes output, "Running tests for ExampleEngine (Rails engine)..."
+        assert_includes output, "engine's Rails test application"
+        refute_includes output, "rake dev:db:reset"
+    end
+
+    def test_gem_header_omits_rails_and_database_guidance
+        output = render_header("gem", "ExampleGem")
+
+        assert_includes output, "Running tests for ExampleGem (Ruby gem)..."
+        refute_match(/Rails|database|rake dev:db:reset/i, output)
+    end
+
     def test_failure_details_use_original_class_and_failure_location
         failure = located_failure(Minitest::Assertion.new("Expected: 1\nActual: 2"), "/real/test/path.rb:42")
         result = build_result("OriginalTestClass", "test_example", failure)
@@ -87,7 +110,7 @@ class CliReporterTest < Minitest::Test
         )
 
         assert_includes output, red_errors_row
-        assert_includes output, "WARNINGS. . . . . . . :"
+        assert_includes output, "WARNINGS . . . . . . :"
         assert_includes output, "WARNING"
         assert_includes output, "deprecated API"
         assert_includes output, "Reason: requires PostgreSQL"
@@ -114,6 +137,8 @@ class CliReporterTest < Minitest::Test
         assert_equal 1, composite.reporters.size
         assert_instance_of LesliTesting::Reporters::CliReporter, composite.reporters.first
         assert_same output, composite.reporters.first.io
+        assert_equal "gem", composite.reporters.first.options[:lesli_testing_profile]
+        assert_equal "LesliTesting", composite.reporters.first.options[:lesli_testing_project_name]
         refute_includes composite.reporters, external_reporter
     ensure
         Minitest.reporter = nil
@@ -171,5 +196,16 @@ class CliReporterTest < Minitest::Test
         results.each { |result| @reporter.record(result) }
         @reporter.report
         @output.string
+    end
+
+    def render_header(profile, project_name)
+        output = StringIO.new
+        reporter = LesliTesting::Reporters::CliReporter.new(
+            output,
+            lesli_testing_profile: profile,
+            lesli_testing_project_name: project_name
+        )
+        reporter.start
+        output.string
     end
 end

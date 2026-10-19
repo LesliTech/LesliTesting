@@ -40,9 +40,9 @@ module LesliTesting
                 run_statistics_reporter(:start)
 
                 io.puts
-                io.puts Termline::Style.colorize("Running Lesli tests...", :blue)
-                io.puts Termline::Style.colorize("-> For a better result run test over a clean database", :blue)
-                io.puts Termline::Style.colorize("-> You can use: rake dev:db:reset", :blue)
+                header_messages.each do |message|
+                    io.puts Termline::Style.colorize(message, :blue)
+                end
                 io.puts
                 io.puts
             end
@@ -162,6 +162,35 @@ module LesliTesting
 
             def write_summary_row(value, tag:, color: :blue)
                 io.puts Termline::Msg.builder(value, tag: tag, color: color, time: false)
+            end
+
+            def header_messages
+                project_name = options[:lesli_testing_project_name]
+
+                case options[:lesli_testing_profile].to_s
+                when "app"
+                    [
+                        header_title(project_name, "Rails application"),
+                        "-> For a better result run tests over a clean database",
+                        "-> You can use: rake dev:db:rebuild"
+                    ]
+                when "engine"
+                    [
+                        header_title(project_name, "Rails engine"),
+                        "-> Tests run through the engine's Rails test application"
+                    ]
+                when "gem"
+                    [header_title(project_name, "Ruby gem")]
+                else
+                    ["Running Lesli tests..."]
+                end
+            end
+
+            def header_title(project_name, project_type)
+                name = project_name.to_s.strip
+                return "Running tests for this #{project_type}..." if name.empty?
+
+                "Running tests for #{name} (#{project_type})..."
             end
 
             def write_status_message(message, tag:, color:, icon:)

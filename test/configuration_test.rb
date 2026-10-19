@@ -118,6 +118,7 @@ class ConfigurationTest < Minitest::Test
             abort "Wrong minimum coverage" unless SimpleCov.minimum_coverage == { line: 37 }
             abort "Wrong missing length" unless SimpleCov::Formatter::Console.missing_len == 12
             abort "Wrong project name" unless LesliTesting.app_name == "ExampleProject"
+            abort "Wrong project profile" unless LesliTesting.profile == "#{api}"
             abort "Wrong public API profile" unless LesliTesting.send(:options)[:coverage_profile] == "#{api}"
 
             #{profile_assertions}
