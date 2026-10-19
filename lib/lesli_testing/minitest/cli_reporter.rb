@@ -39,15 +39,12 @@ module LesliTesting
             def start
                 run_statistics_reporter(:start)
 
-                Termline.br
-
-                Termline.m(
-                    Termline::Style.colorize("Running Lesli tests...", :blue),
-                    Termline::Style.colorize("-> For a better result run test over a clean database", :blue),
-                    Termline::Style.colorize("-> You can use: rake dev:db:reset", :blue)
-                )
-
-                Termline.br 2
+                io.puts
+                io.puts Termline::Style.colorize("Running Lesli tests...", :blue)
+                io.puts Termline::Style.colorize("-> For a better result run test over a clean database", :blue)
+                io.puts Termline::Style.colorize("-> You can use: rake dev:db:reset", :blue)
+                io.puts
+                io.puts
             end
 
             def record(test)
@@ -57,10 +54,11 @@ module LesliTesting
                 return if ENV["QUIET"]
 
                 # Map result codes to styles
-                status_map = { 
-                    "." => [:green, "PASS"], 
-                    "S" => [:yellow, "SKIP"], 
-                    "E" => [:red, "ERROR"], 
+                status_map = {
+                    "." => [:green, "PASS"],
+                    "S" => [:yellow, "SKIP"],
+                    "W" => [:yellow, "WARN"],
+                    "E" => [:red, "ERROR"],
                     "F" => [:red, "FAIL"]
                 }
                 color, label = status_map[test.result_code] || [:gray, "????"]
@@ -85,7 +83,7 @@ module LesliTesting
                 # Add execution time per test
                 parts << Termline::Style.colorize("(%.2fs)" % test.time, :red) if test.time > 1
 
-                puts(parts.join(" "))
+                io.puts(parts.join(" "))
             end
 
             def report
@@ -94,53 +92,60 @@ module LesliTesting
                 total_tests = count.to_i
                 total_failures = failures.to_i
                 total_errors = errors.to_i
+                total_warnings = warnings.to_i
                 total_skips = skips.to_i
                 total_assertions = assertions.to_i
                 duration = total_time.to_f
 
-                passed = total_tests - total_failures - total_errors - total_skips
+                passed = total_tests - total_failures - total_errors - total_warnings - total_skips
                 success_rate = total_tests.zero? ? 0 : ((passed.to_f / total_tests) * 100).round(1)
                 empty_filtered_run = total_tests.zero? && options[:include]
-                status = if empty_filtered_run || total_failures.positive? || total_errors.positive?
+                status = if empty_filtered_run || total_failures.positive? || total_errors.positive? || total_warnings.positive?
                     "FAIL"
                 else
                     "PASS"
                 end
 
-                Termline.br 2
+                io.puts
+                io.puts
 
-                status_color = :blue
-                status_color = :red if status == 'FAIL'
+                status_color = status == "FAIL" ? :red : :blue
+                failures_color = total_failures.positive? ? :red : :blue
+                errors_color = total_errors.positive? ? :red : :blue
+                warnings_color = total_warnings.positive? ? :yellow : :blue
+                success_rate_color = status == "FAIL" ? :red : :blue
 
-                failures_color = :blue
-                failures_color = :red if total_failures > 0
+                write_summary_row(status,                    tag: "STATUS . . . . . . . :", color: status_color)
+                write_summary_row(total_tests,               tag: "TESTS. . . . . . . . :")
+                write_summary_row(passed,                    tag: "PASSED . . . . . . . :")
+                write_summary_row(total_failures,            tag: "FAILURES . . . . . . :", color: failures_color)
+                write_summary_row(total_errors,              tag: "ERRORS . . . . . . . :", color: errors_color)
+                write_summary_row(total_warnings,            tag: "WARNINGS . . . . . . :", color: warnings_color)
+                write_summary_row(total_skips,               tag: "SKIPPED. . . . . . . :")
+                write_summary_row(total_assertions,          tag: "ASSERTIONS . . . . . :")
+                write_summary_row("#{success_rate}%",        tag: "SUCCESS RATE . . . . :", color: success_rate_color)
+                write_summary_row(format("%.2fs", duration), tag: "TIME . . . . . . . . :")
 
-                puts(Termline::Msg.builder(status,                   tag:'STATUS . . . . . . . :', color: status_color, timestamp:nil))
-                puts(Termline::Msg.builder(total_tests,              tag:'TESTS. . . . . . . . :', color: :blue, timestamp:nil))
-                puts(Termline::Msg.builder(passed,                   tag:'PASSED . . . . . . . :', color: :blue, timestamp:nil))
-                puts(Termline::Msg.builder(total_failures,           tag:'FAILURES . . . . . . :', color: failures_color, timestamp:nil))
-                puts(Termline::Msg.builder(total_errors,             tag:'ERRORS . . . . . . . :', color: :blue, timestamp:nil))
-                puts(Termline::Msg.builder(total_skips,              tag:'SKIPPED. . . . . . . :', color: :blue, timestamp:nil))
-                puts(Termline::Msg.builder(total_assertions,         tag:'ASSERTIONS . . . . . :', color: :blue, timestamp:nil))
-                puts(Termline::Msg.builder("#{success_rate}%",       tag:'SUCCESS RATE . . . . :', color: failures_color, timestamp:nil))
-                puts(Termline::Msg.builder(format("%.2fs", duration),tag:'TIME . . . . . . . . :', color: :blue, timestamp:nil))
-
-                Termline.br 2
+                io.puts
+                io.puts
 
                 if empty_filtered_run
-                    Termline.danger(
+                    write_status_message(
                         "No tests matched filter: #{options[:include]}",
-                        tag: "FAILURE"
+                        tag: "FAILURE",
+                        color: :red,
+                        icon: :error
                     )
                 elsif status == "PASS"
-                    Termline.success("Test suite passed")
+                    write_status_message("Test suite passed", tag: "SUCCESS:", color: :green, icon: :success)
                 else
-                    Termline.danger("Test suite failed", tag:'FAILURE')
+                    write_status_message("Test suite failed", tag: "FAILURE", color: :red, icon: :error)
                 end
 
-                Termline.br 2
+                io.puts
+                io.puts
 
-                print_failure_details if total_failures.positive? || total_errors.positive?
+                print_result_details if total_failures.positive? || total_errors.positive? || total_warnings.positive? || total_skips.positive?
 
             end
 
@@ -155,34 +160,86 @@ module LesliTesting
                     .call
             end
 
-            def print_failure_details
-                failed_results = Array(results).select { |result| result.failure }
+            def write_summary_row(value, tag:, color: :blue)
+                io.puts Termline::Msg.builder(value, tag: tag, color: color, time: false)
+            end
+
+            def write_status_message(message, tag:, color:, icon:)
+                io.puts Termline::Msg.builder(message, tag: tag, icon: icon, color: color, time: true)
+            end
+
+            def print_result_details
+                failed_results = Array(results).select(&:failure)
 
                 return if failed_results.empty?
 
                 failed_results.each_with_index do |result, index|
                     failure = result.failure
-                    failure_tag = failure.is_a?(Minitest::Assertion) ? "FAILURE" : "ERROR"
-                    failure_msg = "#{result.class}##{result.name} (#{result.assertions} asserts)"
+                    failure_tag, color, icon = result_style(failure)
+                    failure_msg = "#{result.klass}##{result.name} (#{result.assertions} asserts)"
 
-                    file, line = result.source_location
-                    location_file = file ? "#{file} (line: #{line})" : "Location unknown"
+                    io.puts
+                    io.puts Termline::Space.builder("-·-     ", 6)
+                    io.puts
 
-                    Termline.br
-                    Termline.line(6)
-                    Termline.br
+                    io.puts Termline::Msg.builder(
+                        failure_msg,
+                        tag: " #{Termline::Style.icon(icon)} #{failure_tag} #{index + 1}:",
+                        color: color,
+                        time: false
+                    )
+                    io.puts Termline::Msg.builder(
+                        format_failure_location(failure),
+                        tag: " #{Termline::Style.icon(:debug)}  Location:",
+                        color: :yellow,
+                        time: false
+                    )
 
-                    puts Termline::Msg.builder(failure_msg, tag: " #{Termline::Style.icon(:error)} #{failure_tag} #{index + 1}:", color: :red, timestamp:nil)
-                    puts Termline::Msg.builder(location_file, tag: " #{Termline::Style.icon(:debug)}  Location:", color: :yellow, timestamp:nil)
-
-                    if failure.is_a?(Minitest::Assertion)
-                        result.failure.message.to_s.lines.each do |message|
-                            puts(parse_minitest_assertion_messages(message))
-                        end
-                    end
+                    print_result_message(failure)
                 end
 
-                Termline.br
+                io.puts
+            end
+
+            def result_style(failure)
+                case failure
+                when Minitest::Skip
+                    ["SKIP", :yellow, :warning]
+                when Minitest::UnexpectedWarning
+                    ["WARNING", :yellow, :warning]
+                when Minitest::UnexpectedError
+                    ["ERROR", :red, :error]
+                else
+                    ["FAILURE", :red, :error]
+                end
+            end
+
+            def format_failure_location(failure)
+                location = failure.location.to_s
+                return "Location unknown" if location.empty? || location == "unknown:-1"
+
+                match = location.match(/\A(.+):(\d+)\z/)
+                return location unless match
+
+                "#{match[1]} (line: #{match[2]})"
+            end
+
+            def print_result_message(failure)
+                if failure.is_a?(Minitest::Skip)
+                    io.puts Termline::Style.colorize(
+                        " #{Termline::Style.icon(:warning)}  Reason: #{failure.message}",
+                        :yellow
+                    )
+                elsif failure.is_a?(Minitest::UnexpectedWarning)
+                    io.puts Termline::Style.colorize(
+                        " #{Termline::Style.icon(:warning)}  #{failure.message}",
+                        :yellow
+                    )
+                else
+                    failure.message.to_s.lines.each do |message|
+                        io.puts parse_minitest_assertion_messages(message)
+                    end
+                end
             end
 
             def parse_minitest_assertion_messages(message)
@@ -197,10 +254,10 @@ module LesliTesting
                         # +++ actual
                         # @@ -1 +1 @@
                         when /^--- /
-                            Termline::Style.colorize("#{msg}:", :red)
+                            Termline::Style.colorize(msg, :red)
 
                         when /^\+\+\+ /
-                            Termline::Style.colorize("++#{msg}:", :green)
+                            Termline::Style.colorize(msg, :green)
 
                         when /^@@ / 
                             Termline::Style.colorize("#{msg}", :skyblue)
@@ -211,10 +268,10 @@ module LesliTesting
                         # +[:lesli_support_items_tasks, "lesli_support"]
                         # The negative lookahead avoids matching the diff headers above.
                         when /^-(?!-)/
-                            Termline::Style.colorize(" #{Termline::Style.icon(:remove)}-#{msg}", :red)
+                            Termline::Style.colorize(" #{Termline::Style.icon(:remove)} #{msg}", :red)
 
                         when /^\+(?!\+)/
-                            Termline::Style.colorize(" #{Termline::Style.icon(:add)}+#{msg}", :green)
+                            Termline::Style.colorize(" #{Termline::Style.icon(:add)} #{msg}", :green)
 
                         # 3. Boolean/Nil Failures
                         # Covers cases like:

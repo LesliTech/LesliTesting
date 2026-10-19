@@ -7,6 +7,6 @@ module Minitest
 
     def self.plugin_lesli_testing_init(options)
         reporter.reporters.clear if reporter.respond_to?(:reporters)
-        reporter << LesliTesting::Reporters::CliReporter.new($stdout, options)
+        reporter << LesliTesting::Reporters::CliReporter.new(options[:io] || $stdout, options)
     end
 end
