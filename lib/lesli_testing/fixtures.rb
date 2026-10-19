@@ -33,39 +33,56 @@ Building a better future, one line of code at a time.
 module LesliTesting
     module Fixtures
         class << self
-            def load_fixtures_for_lesli()
+            def install!
+                return if @installed
 
-                if defined?(Lesli)
-                    ActiveSupport.on_load(:active_support_test_case) do
-                        # En Rails 8, usamos ActiveRecord::TestFixtures si está disponible
-                        include ActiveRecord::TestFixtures if defined?(ActiveRecord::TestFixtures)
-
-                        lesli_fixtures = Lesli::Engine.root.join("test", "fixtures").to_s
-                        lesli_files = Lesli::Engine.root.join("test", "fixtures", "files").to_s
-
-                        # Rails 8 usa fixture_paths (plural) como el estándar
-                        # Pero para evitar el NoMethodError, lo asignamos de forma segura:
-                        if respond_to?(:fixture_paths=)
-                            # Combinamos las rutas existentes con la nueva del Engine
-                            self.fixture_paths |= [ lesli_fixtures ]
-                        else
-                            # Fallback por si la carga de ActiveRecord se retrasa
-                            class_attribute :fixture_paths, default: [ lesli_fixtures ]
-                        end
-
-                        # Los archivos adjuntos (Active Storage, etc)
-                        self.file_fixture_path = lesli_files
-
-                        # IMPORTANT: attach fixture sets to namespaced models BEFORE loading fixtures
-                        self.set_fixture_class(
-                            lesli_users:    "Lesli::User",
-                            lesli_accounts: "Lesli::Account"
-                        )
-                    end
+                ActiveSupport.on_load(
+                    :active_support_test_case,
+                    run_once: true,
+                    yield: true
+                ) do |test_case|
+                    configure_lesli_fixtures(test_case)
                 end
+
+                @installed = true
             end
 
             def load_fixtures_for_engine(engine_module)
+            end
+
+            private
+
+            def configure_lesli_fixtures(test_case)
+                return unless defined?(Lesli::Engine)
+
+                if defined?(ActiveRecord::TestFixtures)
+                    test_case.include(ActiveRecord::TestFixtures)
+                end
+
+                lesli_fixtures = Lesli::Engine.root.join("test", "fixtures").to_s
+                lesli_files = Lesli::Engine.root.join("test", "fixtures", "files").to_s
+
+                if test_case.respond_to?(:fixture_paths=)
+                    current_paths = if test_case.respond_to?(:fixture_paths)
+                        Array(test_case.fixture_paths)
+                    else
+                        []
+                    end
+                    test_case.fixture_paths = current_paths | [lesli_fixtures]
+                elsif test_case.respond_to?(:class_attribute)
+                    test_case.class_attribute :fixture_paths, default: [lesli_fixtures]
+                end
+
+                if test_case.respond_to?(:file_fixture_path=)
+                    test_case.file_fixture_path = lesli_files
+                end
+
+                if test_case.respond_to?(:set_fixture_class)
+                    test_case.set_fixture_class(
+                        lesli_users:    "Lesli::User",
+                        lesli_accounts: "Lesli::Account"
+                    )
+                end
             end
         end
     end

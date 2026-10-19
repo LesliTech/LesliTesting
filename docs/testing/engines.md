@@ -81,7 +81,7 @@ GitHub Actions installs only dependencies available from the declared sources. A
 
 ## Test helper
 
-Configure LesliTesting before booting the dummy application so SimpleCov can observe engine boot code. Run the suite through Rails' test runner, which loads the Rails testing framework required by the shared tester classes.
+Configure LesliTesting before booting the dummy application so SimpleCov can observe engine boot code. LesliTesting registers the engine Railtie immediately and creates its shared tester classes later, when `rails/test_help` fires the corresponding ActiveSupport hooks.
 
 ```ruby
 ENV["RAILS_ENV"] ||= "test"

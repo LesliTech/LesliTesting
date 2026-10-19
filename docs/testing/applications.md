@@ -9,14 +9,15 @@ A conventional `test/test_helper.rb` is:
 ```ruby
 ENV["RAILS_ENV"] ||= "test"
 
-require_relative "../config/environment"
-require "rails/test_help"
 require "lesli_testing"
 
 LesliTesting.app(
   "LesliBuilder",
   coverage_min_coverage: 90
 )
+
+require_relative "../config/environment"
+require "rails/test_help"
 
 module ActiveSupport
   class TestCase
@@ -25,7 +26,7 @@ module ActiveSupport
 end
 ```
 
-Loading `rails/test_help` first makes the LesliTesting Rails base classes available. Keep the configuration before any explicit `require` calls that load application components solely for the test suite.
+LesliTesting starts coverage before the application boots, registers its Minitest reporter, and then waits for Rails load hooks. Requiring `rails/test_help` creates the shared Rails base classes before the test files are loaded.
 
 ## Application coverage profile
 

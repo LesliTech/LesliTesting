@@ -31,35 +31,83 @@ Building a better future, one line of code at a time.
 =end
 
 
-#
-require_relative "helpers/response_integration_helper"
-
-#
 module LesliTesting
+    module Testers
+        class << self
+            def install!
+                return if @installed
 
-    if defined?(ActionDispatch::IntegrationTest)
-        class IntegrationTester < ActionDispatch::IntegrationTest
-            include ResponseIntegrationHelper
-        end
-    end
-
-    if defined?(ActionView::TestCase)
-        class ViewTester < ActionView::TestCase
-            # We use a hook to include the helpers only when the class is used.
-            # This ensures Lesli core is fully loaded by Rails before we ask for the helpers.
-            def self.inherited(subclass)
-                super
-                subclass.class_eval do
-                    include Lesli::HtmlHelper   if defined?(Lesli::HtmlHelper)
-                    include Lesli::SystemHelper if defined?(Lesli::SystemHelper)
+                ActiveSupport.on_load(
+                    :action_dispatch_integration_test,
+                    run_once: true,
+                    yield: true
+                ) do |test_case|
+                    define_integration_tester(test_case)
                 end
-            end
-        end
-    end
 
-    if defined?(ActiveSupport::TestCase)
-        class ModelTester < ActiveSupport::TestCase
-            include ActiveSupport::Testing::TimeHelpers
+                ActiveSupport.on_load(
+                    :action_view_test_case,
+                    run_once: true,
+                    yield: true
+                ) do |test_case|
+                    define_view_tester(test_case)
+                end
+
+                ActiveSupport.on_load(
+                    :active_support_test_case,
+                    run_once: true,
+                    yield: true
+                ) do |test_case|
+                    define_model_tester(test_case)
+                    load_rails_test_cases
+                end
+
+                @installed = true
+            end
+
+            private
+
+            def define_integration_tester(test_case)
+                return if LesliTesting.const_defined?(:IntegrationTester, false)
+
+                require_relative "helpers/response_integration_helper"
+
+                tester = Class.new(test_case) do
+                    include ::ResponseIntegrationHelper
+                end
+                LesliTesting.const_set(:IntegrationTester, tester)
+            end
+
+            def define_view_tester(test_case)
+                return if LesliTesting.const_defined?(:ViewTester, false)
+
+                tester = Class.new(test_case) do
+                    def self.inherited(subclass)
+                        super
+                        subclass.class_eval do
+                            include Lesli::HtmlHelper   if defined?(Lesli::HtmlHelper)
+                            include Lesli::SystemHelper if defined?(Lesli::SystemHelper)
+                        end
+                    end
+                end
+                LesliTesting.const_set(:ViewTester, tester)
+            end
+
+            def define_model_tester(test_case)
+                return if LesliTesting.const_defined?(:ModelTester, false)
+
+                require "active_support/testing/time_helpers"
+
+                tester = Class.new(test_case) do
+                    include ActiveSupport::Testing::TimeHelpers
+                end
+                LesliTesting.const_set(:ModelTester, tester)
+            end
+
+            def load_rails_test_cases
+                require "action_dispatch/testing/integration"
+                require "action_view/test_case"
+            end
         end
     end
 end

@@ -72,7 +72,7 @@ Set it to `0` to remove the limit.
 
 ## Shared Rails test classes
 
-The shared classes are defined only when their corresponding Rails classes have already been loaded. Engine suites should run through `bundle exec rails test` or `bundle exec rake app:test`, which initializes the Rails testing framework before loading test files.
+The shared classes are registered through ActiveSupport load hooks. They are created when `rails/test_help` loads their corresponding Rails classes, regardless of whether LesliTesting was configured before or after the Rails application booted. Engine suites should still run through `bundle exec rails test` or `bundle exec rake app:test`.
 
 ### IntegrationTester
 
@@ -131,6 +131,6 @@ When `Lesli` is loaded, LesliTesting registers the Lesli engine's fixture direct
 | `lesli_users` | `Lesli::User` |
 | `lesli_accounts` | `Lesli::Account` |
 
-The fixture integration runs during configuration. Load the Rails environment and the Lesli engine before calling the profile method when the suite depends on these shared fixtures.
+The fixture integration is registered during configuration and applied when `ActiveSupport::TestCase` becomes available. This allows coverage to start before Rails without losing the shared fixture setup.
 
 Engine-specific fixture paths remain the responsibility of the engine test helper. See [Testing Rails engines](/gems/testing/testing/engines) for an example.

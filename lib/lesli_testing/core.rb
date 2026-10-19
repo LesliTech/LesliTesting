@@ -35,13 +35,6 @@ Building a better future, one line of code at a time.
 
 require_relative "version"
 
-begin
-    require "rails/engine"
-    require_relative "engine"
-rescue LoadError
-    # Rails is optional when LesliTesting is used by a standalone Ruby gem.
-end
-
 
 module LesliTesting
     class Error < StandardError; end
@@ -81,16 +74,17 @@ module LesliTesting
         def configure(name, options)
             self.app_name = name
             self.options = options_default.merge(options)
-            configure_gems()
-            configure_reporter()
             configure_coverage()
-            configure_fixtures()
+            configure_reporter()
+            configure_rails_integrations()
         end
 
         def configure_coverage()
 
             return unless ENV["COVERAGE"]
             return if defined?(SimpleCov) && SimpleCov.started_in_this_process?
+
+            require_relative "coverage"
 
             # Start Coverage
             LesliTesting::Coverage.start(
@@ -101,33 +95,24 @@ module LesliTesting
             )
         end
 
-        # Load test configuration and test helper modules
-        def configure_fixtures()
-            LesliTesting::Fixtures.load_fixtures_for_lesli()
-        end
-
         def configure_reporter
+            require "minitest"
+            require "termline" unless defined?(Termline)
+            require "minitest/lesli_testing_plugin"
+
             # Force Minitest to know about Lesli Minitest reporter plugin
             unless Minitest.extensions.include?("lesli_testing")
                 Minitest.register_plugin("lesli_testing")
             end
         end
 
-        def configure_gems
-            return if @tools_loaded
+        def configure_rails_integrations
+            return if self.options[:coverage_profile] == "gem"
 
-            require "minitest"
-
-            # Load minitest plugin
-            require "minitest/lesli_testing_plugin"
-            require "termline" unless defined?(Termline)
-
-            # Load helper files
-            require_relative "testers"
-            require_relative "fixtures"
-            require_relative "coverage"
-
-            @tools_loaded = true
+            require_relative "rails_integration"
+            LesliTesting::RailsIntegration.install!(
+                profile: self.options[:coverage_profile]
+            )
         end
     end
 end
