@@ -33,101 +33,15 @@ Building a better future, one line of code at a time.
 =end
 
 
-require_relative "lesli_testing/version"
-
-begin
-    require "rails/engine"
-    require_relative "lesli_testing/engine"
-rescue LoadError
-    # Rails is optional when LesliTesting is used by a standalone Ruby gem.
+# Coverage must begin before Ruby compiles the LesliTesting implementation,
+# Rails, or the project under test. The selected SimpleCov profile and
+# formatters are applied later by LesliTesting.app, LesliTesting.engine, or
+# LesliTesting.gem.
+# simplecov:disable
+if ENV["COVERAGE"]
+    require "coverage"
+    Coverage.start(lines: true) unless Coverage.running?
 end
 
-
-module LesliTesting
-    class Error < StandardError; end
-
-    class << self
-
-        attr_accessor :app_module; 
-        attr_accessor :app_name; 
-        attr_writer :options
-
-        def app(name, options = {})
-            configure(name, options.merge(coverage_profile: "app"))
-        end
-
-        def engine(name, options = {})
-            configure(name, options.merge(coverage_profile: "engine"))
-        end
-
-        def gem(name, options = {})
-            configure(name, options.merge(coverage_profile: "gem"))
-        end
-
-        private 
-
-        def options
-            @options ||= options_default
-        end
-
-        def options_default
-            {
-                coverage_profile: "app",
-                coverage_missing_len: 25,
-                coverage_min_coverage: 90
-            }
-        end
-
-        def configure(name, options)
-            self.app_name = name
-            self.options = options_default.merge(options)
-            configure_gems()
-            configure_reporter()
-            configure_coverage()
-            configure_fixtures()
-        end
-
-        def configure_coverage()
-
-            return unless ENV["COVERAGE"]
-            return if defined?(SimpleCov) && SimpleCov.coverage_running?
-
-            # Start Coverage
-            LesliTesting::Coverage.start(
-                self.app_name, 
-                profile: self.options[:coverage_profile],
-                missing_len: self.options[:coverage_missing_len],
-                min_coverage: self.options[:coverage_min_coverage]
-            )
-        end 
-
-        # Load test configuration and test helper modules
-        def configure_fixtures()
-            LesliTesting::Fixtures.load_fixtures_for_lesli()
-        end
-
-        def configure_reporter
-            # Force Minitest to know about Lesli Minitest reporter plugin
-            unless Minitest.extensions.include?("lesli_testing")
-                Minitest.register_plugin("lesli_testing") 
-            end
-        end
-
-        def configure_gems
-            return if @tools_loaded
-
-            require "minitest"
-
-            # Load minitest plugin
-            require "minitest/lesli_testing_plugin"
-            require "termline" unless defined?(Termline)
-
-            # Load helper files
-            require_relative "lesli_testing/testers"
-            require_relative "lesli_testing/fixtures"
-            require_relative "lesli_testing/coverage"
-
-            @tools_loaded = true
-        end
-    end
-end
+require_relative "lesli_testing/core"
+# simplecov:enable

@@ -49,7 +49,7 @@ It standardizes Minitest output, SimpleCov profiles, coverage reports, and fixtu
 
 - Coverage profiles for Rails applications, Rails engines, and Ruby gems
 - A human-friendly Minitest reporter with per-test timing and failure details
-- SimpleCov HTML, console, and Cobertura reports
+- SimpleCov console and Cobertura reports
 - Configurable minimum coverage thresholds
 - Shared base classes for integration, model, and view tests
 - Automatic access to Lesli fixtures in Rails test cases

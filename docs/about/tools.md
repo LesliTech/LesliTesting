@@ -30,6 +30,8 @@ Coverage is disabled during ordinary test runs. Set `COVERAGE` to any value to s
 COVERAGE=true bundle exec rake
 ```
 
+When coverage is enabled, requiring `lesli_testing` starts Ruby's line coverage before the LesliTesting implementation, Rails, or the project under test is loaded. The subsequent `LesliTesting.app`, `LesliTesting.engine`, or `LesliTesting.gem` call applies the selected SimpleCov profile, formatters, and minimum threshold.
+
 Every coverage run produces:
 
 | Format | Output |

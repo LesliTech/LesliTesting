@@ -1,6 +1,6 @@
 # Testing Ruby gems
 
-LesliTesting supports standalone Ruby gems without Rails. In this mode it configures Minitest, the custom terminal reporter, SimpleCov, and all coverage formatters. Rails-only base classes and fixture integration are skipped.
+LesliTesting supports standalone Ruby gems without Rails. In this mode it configures Minitest, the custom terminal reporter, SimpleCov, and the console and Cobertura coverage formatters. Rails-only base classes and fixture integration are skipped.
 
 ## Recommended structure
 
