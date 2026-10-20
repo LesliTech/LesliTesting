@@ -203,6 +203,6 @@ When diagnosing a CI-only boot failure, reproduce it locally with `CI=true`, rea
 
 ## Engine coverage profile
 
-The engine profile loads SimpleCov's Rails defaults and excludes files under `test/`. It produces console and Cobertura reports when `COVERAGE` is present.
+The engine profile loads SimpleCov's Rails defaults and excludes files under `test/`. It produces console and Cobertura reports when `COVERAGE` is set to `true`, `1`, or `yes`.
 
 When the engine is developed inside a host application, run commands from the engine directory so its own Gemfile, test helper, lockfile, and coverage directory are used.

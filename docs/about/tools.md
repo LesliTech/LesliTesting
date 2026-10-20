@@ -24,7 +24,7 @@ QUIET=true bundle exec rake
 
 ## Coverage
 
-Coverage is disabled during ordinary test runs. Set `COVERAGE` to any value to start SimpleCov:
+Coverage is disabled during ordinary test runs. Set `COVERAGE` to `true`, `1`, or `yes` to start SimpleCov:
 
 ```shell
 COVERAGE=true bundle exec rake
@@ -65,10 +65,10 @@ Set it to `0` to remove the limit.
 
 | Variable | Behavior |
 | --- | --- |
-| `COVERAGE` | Enables SimpleCov with the console and Cobertura formatters. |
-| `QUIET` | Hides individual test-result lines from the custom reporter. |
+| `COVERAGE` | Enables SimpleCov with the console and Cobertura formatters when set to `true`, `1`, or `yes`. |
+| `QUIET` | Hides individual test-result lines from the custom reporter when set to `true`, `1`, or `yes`. |
 
-`COVERAGE` and `QUIET` are enabled by presence. Do not set them to `false`; leave them unset when the behavior should be disabled.
+Values are case-insensitive and surrounding whitespace is ignored. Only `true`, `1`, and `yes` enable these options. Unset variables and values such as `false`, `0`, and `no` leave them disabled.
 
 ## Shared Rails test classes
 

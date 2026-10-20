@@ -8,6 +8,6 @@ LesliTesting configures one shared Minitest workflow for three project shapes. S
 | `LesliTesting.engine(name, options)` | An isolated or mountable Rails engine | [Engines](/gems/testing/testing/engines) |
 | `LesliTesting.gem(name, options)` | A standalone Ruby gem | [Gems](/gems/testing/testing/gems) |
 
-All profiles configure the custom Minitest reporter. When `COVERAGE` is present they also start the matching SimpleCov profile and produce console and Cobertura output.
+All profiles configure the custom Minitest reporter. When `COVERAGE` is set to `true`, `1`, or `yes`, they also start the matching SimpleCov profile and produce console and Cobertura output.
 
 Start with [Installation and configuration](/gems/testing/about/installation), then choose the guide for the repository being tested. [Testing tools](/gems/testing/about/tools) documents coverage options, shared test classes, response helpers, and fixture integration.

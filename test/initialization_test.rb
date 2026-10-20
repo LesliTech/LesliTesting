@@ -33,6 +33,26 @@ class InitializationTest < Minitest::Test
         assert_child_success(script)
     end
 
+    def test_coverage_starts_only_for_explicit_true_values
+        enabled_script = <<~RUBY
+            require "lesli_testing"
+            abort "Coverage was not started" unless defined?(::Coverage) && ::Coverage.running?
+        RUBY
+
+        disabled_script = <<~RUBY
+            require "lesli_testing"
+            abort "Coverage was started" if defined?(::Coverage) && ::Coverage.running?
+        RUBY
+
+        %w[true 1 yes].each do |value|
+            assert_child_success(enabled_script, environment: { "COVERAGE" => value })
+        end
+
+        %w[false 0 no].each do |value|
+            assert_child_success(disabled_script, environment: { "COVERAGE" => value })
+        end
+    end
+
     def test_gem_profile_loads_reporter_without_rails_integrations
         script = <<~RUBY
             require "lesli_testing"
@@ -108,9 +128,9 @@ class InitializationTest < Minitest::Test
 
     private
 
-    def assert_child_success(script)
+    def assert_child_success(script, environment: {})
         stdout, stderr, status = Open3.capture3(
-            { "COVERAGE" => nil },
+            { "COVERAGE" => nil }.merge(environment),
             RbConfig.ruby,
             "-I#{LIB_PATH}",
             "-e",

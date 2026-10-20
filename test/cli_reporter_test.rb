@@ -122,6 +122,23 @@ class CliReporterTest < Minitest::Test
         assert_kind_of Minitest::SummaryReporter, @reporter
     end
 
+    def test_quiet_hides_results_only_for_explicit_true_values
+        result = Minitest::Result.new("test_example")
+        result.klass = "ExampleTest"
+        result.assertions = 1
+        result.time = 0.01
+
+        %w[true 1 yes].each do |value|
+            output = record_result(result, quiet: value)
+            assert_empty output, value
+        end
+
+        %w[false 0 no].each do |value|
+            output = record_result(result, quiet: value)
+            assert_includes output, "test_example", value
+        end
+    end
+
     def test_plugin_removes_all_other_reporters
         output = StringIO.new
         external_reporter = Minitest::AbstractReporter.new
@@ -207,5 +224,16 @@ class CliReporterTest < Minitest::Test
         )
         reporter.start
         output.string
+    end
+
+    def record_result(result, quiet:)
+        output = StringIO.new
+        reporter = LesliTesting::Reporters::CliReporter.new(output, {})
+        previous = ENV["QUIET"]
+        ENV["QUIET"] = quiet
+        reporter.record(result)
+        output.string
+    ensure
+        previous.nil? ? ENV.delete("QUIET") : ENV["QUIET"] = previous
     end
 end

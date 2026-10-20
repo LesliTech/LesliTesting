@@ -38,7 +38,9 @@ Building a better future, one line of code at a time.
 # formatters are applied later by LesliTesting.app, LesliTesting.engine, or
 # LesliTesting.gem.
 # simplecov:disable
-if ENV["COVERAGE"]
+require_relative "lesli_testing/environment"
+
+if LesliTesting::Environment.enabled?("COVERAGE")
     require "coverage"
     Coverage.start(lines: true) unless Coverage.running?
 end

@@ -34,6 +34,7 @@ Building a better future, one line of code at a time.
 
 
 require_relative "version"
+require_relative "environment"
 
 
 module LesliTesting
@@ -85,7 +86,7 @@ module LesliTesting
 
         def configure_coverage()
 
-            return unless ENV["COVERAGE"]
+            return unless LesliTesting::Environment.enabled?("COVERAGE")
             return if defined?(SimpleCov) && SimpleCov.started_in_this_process?
 
             require_relative "coverage"

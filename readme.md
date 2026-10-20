@@ -86,7 +86,7 @@ LesliTesting does not provide an engine's runtime dependencies. Declare dependen
 
 For Rails engines, the engine name is also used to discover its `Engine` class after the dummy application boots. LesliTesting then configures the engine and shared Lesli fixtures, fixture classes, and migration paths without duplicating that setup in `test_helper.rb`.
 
-Run the suite normally or enable coverage with `COVERAGE`:
+Run the suite normally or enable coverage with `COVERAGE=true` (`1` and `yes` are also accepted):
 
 ```shell
 bin/rails test
@@ -96,7 +96,7 @@ bundle exec rake
 COVERAGE=true bundle exec rake
 ```
 
-Set `QUIET=true` to hide individual passing-test lines while retaining the summary and failure details.
+Set `QUIET=true` (`1` and `yes` are also accepted) to hide individual test lines while retaining the summary and failure details. Values such as `false`, `0`, and `no` leave the option disabled.
 
 <br />
 

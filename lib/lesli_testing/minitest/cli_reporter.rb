@@ -30,6 +30,8 @@ Building a better future, one line of code at a time.
 // · 
 =end
 
+require_relative "../environment"
+
 module LesliTesting
     module Reporters
         # Inheriting from SummaryReporter is important even though LesliTesting
@@ -51,7 +53,7 @@ module LesliTesting
                 super
 
                 # Only print the line if the configuration allows it
-                return if ENV["QUIET"]
+                return if LesliTesting::Environment.enabled?("QUIET")
 
                 # Map result codes to styles
                 status_map = {
