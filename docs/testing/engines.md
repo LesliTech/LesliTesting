@@ -81,7 +81,7 @@ GitHub Actions installs only dependencies available from the declared sources. A
 
 ## Test helper
 
-Configure LesliTesting before booting the dummy application so SimpleCov can observe engine boot code. LesliTesting registers the engine Railtie immediately and creates its shared tester classes later, when `rails/test_help` fires the corresponding ActiveSupport hooks.
+Configure LesliTesting before booting the dummy application so SimpleCov can observe engine boot code. LesliTesting registers its test-only Railtie immediately and creates its shared tester classes later, when `rails/test_help` fires the corresponding ActiveSupport hooks.
 
 ```ruby
 ENV["RAILS_ENV"] ||= "test"
@@ -106,6 +106,12 @@ After the dummy application boots, LesliTesting resolves `MyEngine::Engine` and 
 
 Paths already registered by Rails or another engine are preserved and de-duplicated.
 
+The first argument is used as both the reporter name and engine target. When they differ, provide the target explicitly:
+
+```ruby
+LesliTesting.engine("My engine tests", engine: "MyEngine")
+```
+
 Use declarative options when an engine needs custom fixture sets, mappings, shared engines, or paths:
 
 ```ruby
@@ -117,7 +123,8 @@ LesliTesting.engine(
     owner: "MyEngine",
     path: File.expand_path("custom/fixtures", __dir__),
     file_path: File.expand_path("custom/fixtures/files", __dir__),
-    shared: ["Lesli", "AnotherEngine"],
+    # Lesli is always included; list only additional shared engines.
+    shared: ["AnotherEngine"],
     shared_paths: [File.expand_path("shared/fixtures", __dir__)],
     sets: [:lesli_accounts, :my_engine_records],
     classes: {
@@ -128,13 +135,14 @@ LesliTesting.engine(
     # Dummy and owner migrations are included by default.
     include_dummy: true,
     include_owner: true,
-    shared: ["Lesli", "AnotherEngine"],
+    # Lesli is always included; list only additional shared engines.
+    shared: ["AnotherEngine"],
     paths: [File.expand_path("custom/migrate", __dir__)]
   }
 )
 ```
 
-Omit these options for the conventional structure. Use `fixtures: false` or `migrations: false` only when the engine intentionally manages that integration itself. The default fixture set is `:all`.
+Omit these options for the conventional structure of the target engine. `Lesli` is always included for application and engine profiles. The `shared:` option adds other shared engines without removing `Lesli`. Use `fixtures: false` or `migrations: false` only when the engine intentionally manages that integration itself. The default fixture set is `:all`.
 
 An engine exposed through `fixtures[:shared]` must include its fixture files in the built gem. Lesli packages `test/fixtures/**/*` for this purpose; apply the same rule to another engine before using it as a shared fixture source in CI.
 

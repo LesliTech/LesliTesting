@@ -32,8 +32,22 @@ Building a better future, one line of code at a time.
 
 module LesliTesting
     class Engine < ::Rails::Engine
+        class << self
+            attr_reader :engine_target
+
+            def configure(engine_target:)
+                @engine_target = engine_target
+            end
+        end
+
         initializer "lesli_testing.load_required_migrations", after: :load_config_initializers do |app|
-            LesliTesting::Fixtures.configure_migration_paths(app)
+            next unless Rails.env.test?
+            next unless LesliTesting::Engine.engine_target
+
+            LesliTesting::Fixtures.configure_migration_paths(
+                app,
+                engine_target: LesliTesting::Engine.engine_target
+            )
         end
     end
 end

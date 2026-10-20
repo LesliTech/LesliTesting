@@ -7,22 +7,24 @@ require_relative "fixtures"
 module LesliTesting
     module RailsIntegration
         class << self
-            def install!(profile:, project_name:, options:)
+            def install!(profile:, project_name:, engine_target: nil, options:)
                 LesliTesting::Fixtures.install!(
                     profile: profile,
-                    engine_name: project_name,
+                    engine_name: engine_target || project_name,
                     options: options
                 )
-                install_engine! if profile == "engine"
+                install_engine!(engine_target || project_name) if profile == "engine"
                 LesliTesting::Testers.install!
             end
 
             private
 
-            def install_engine!
+            def install_engine!(engine_target)
                 require "rails"
                 require "rails/engine"
                 require_relative "engine"
+
+                LesliTesting::Engine.configure(engine_target: engine_target)
             end
         end
     end

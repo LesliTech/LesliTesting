@@ -131,13 +131,19 @@ For the engine profile, LesliTesting waits for Rails to load and then resolves t
 - the dummy application's, owner engine's, and shared Lesli migration directories;
 - all fixtures on `ActiveSupport::TestCase` and their paths on integration tests.
 
-It also maps the shared Lesli fixture sets to their namespaced models:
+The migration Railtie runs only when `Rails.env.test?`. The engine name is the default target; use `engine:` when the reporter name and engine constant differ:
+
+```ruby
+LesliTesting.engine("My engine tests", engine: "MyEngine")
+```
+
+`Lesli` is always the shared base for Rails application and engine profiles. Additional values passed through `shared:` are appended without removing it. LesliTesting maps these fixture sets to their namespaced models:
 
 | Fixture set | Model |
 | --- | --- |
 | `lesli_users` | `Lesli::User` |
 | `lesli_accounts` | `Lesli::Account` |
 
-Fixture paths and classes are applied through Rails load hooks. Migration paths are added during the dummy application's boot and again when Active Record becomes available; both operations preserve and de-duplicate existing paths. This allows coverage to start before Rails without losing test data configuration.
+Fixture paths and classes are applied through Rails load hooks. Migration paths are added during the dummy application's test boot and again when Active Record becomes available; both operations preserve and de-duplicate existing paths. This allows coverage to start before Rails without losing test data configuration.
 
 Custom owners, paths, shared engines, fixture sets, model mappings, and migration paths can be supplied through the `fixtures:` and `migrations:` options. See [Testing Rails engines](/gems/testing/testing/engines) for the complete configuration.

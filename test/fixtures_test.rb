@@ -32,6 +32,20 @@ class FixturesTest < Minitest::Test
                 end
             end
 
+            module Rails
+                Environment = Struct.new(:name) do
+                    def test?
+                        name == "test"
+                    end
+                end
+
+                class << self
+                    attr_accessor :env
+                end
+
+                self.env = Environment.new("test")
+            end
+
             class FakeTestCase
                 class << self
                     attr_accessor :fixture_paths, :file_fixture_path
@@ -98,6 +112,28 @@ class FixturesTest < Minitest::Test
 
                 require "lesli_testing/fixtures"
 
+                default_configuration = LesliTesting::Fixtures.send(
+                    :build_configuration,
+                    "engine",
+                    "Owner",
+                    {}
+                )
+                abort "Lesli fixtures are not enabled by default" unless default_configuration[:fixtures][:shared] == ["Lesli"]
+                abort "Lesli migrations are not enabled by default" unless default_configuration[:migrations][:shared] == ["Lesli"]
+
+                extended_configuration = LesliTesting::Fixtures.send(
+                    :build_configuration,
+                    "engine",
+                    "Owner",
+                    {
+                        fixtures: { shared: ["Shared"] },
+                        migrations: { shared: ["Shared"] }
+                    }
+                )
+                expected_shared = ["Lesli", "Shared"]
+                abort "Custom fixtures replaced Lesli" unless extended_configuration[:fixtures][:shared] == expected_shared
+                abort "Custom migrations replaced Lesli" unless extended_configuration[:migrations][:shared] == expected_shared
+
                 LesliTesting::Fixtures.install!(
                     profile: "engine",
                     engine_name: "Owner",
@@ -161,6 +197,13 @@ class FixturesTest < Minitest::Test
                 abort "Wrong migration paths" unless configured_migrations == expected_migrations
                 abort "Rails migration paths missing" unless migration_paths.expanded == [existing_migration, *expected_migrations]
                 abort "ActiveRecord migration paths missing" unless ActiveRecord::Migrator.migrations_paths == [existing_migration, *expected_migrations]
+
+                Rails.env = Rails::Environment.new("development")
+                before_development = migration_paths.expanded
+                configured_in_development = LesliTesting::Fixtures.configure_migration_paths(application)
+                abort "Migrations configured outside test" unless configured_in_development.empty?
+                abort "Rails paths changed outside test" unless migration_paths.expanded == before_development
+                Rails.env = Rails::Environment.new("test")
 
                 Dir.chdir(directory) do
                     ActiveRecord::Migrator.migrations_paths = ["owner/db/migrate"]

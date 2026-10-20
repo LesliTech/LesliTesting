@@ -84,7 +84,7 @@ CI=true bundle exec rails test
 
 LesliTesting does not provide an engine's runtime dependencies. Declare dependencies such as `lesli` explicitly in the engine gemspec and Gemfile so local and CI dependency resolution match.
 
-For Rails engines, the engine name is also used to discover its `Engine` class after the dummy application boots. LesliTesting then configures the engine and shared Lesli fixtures, fixture classes, and migration paths without duplicating that setup in `test_helper.rb`.
+For Rails applications and engines, `Lesli` is always included as the shared testing base. Engine profiles use the configured engine name to discover its `Engine` class after the dummy application boots and register the target and Lesli fixture and migration paths. Migration paths are modified only in the test environment. Pure Ruby gems remain independent from Rails and Lesli integrations.
 
 Run the suite normally or enable coverage with `COVERAGE=true` (`1` and `yes` are also accepted):
 

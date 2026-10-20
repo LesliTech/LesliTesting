@@ -80,14 +80,15 @@ module LesliTesting
                 )
             end
 
-            def configure_migration_paths(application = nil)
+            def configure_migration_paths(application = nil, engine_target: nil)
                 configuration = @configuration
                 return [] unless configuration
                 return [] unless configuration[:profile] == "engine"
                 return [] unless configuration[:migrations][:enabled]
+                return [] unless test_environment?
 
                 application ||= Rails.application if defined?(Rails.application)
-                paths = migration_paths(application)
+                paths = migration_paths(application, engine_target: engine_target)
 
                 add_application_migration_paths(application, paths)
                 add_active_record_migration_paths(paths)
@@ -96,6 +97,13 @@ module LesliTesting
             end
 
             private
+
+            def test_environment?
+                return false unless defined?(Rails)
+                return false unless Rails.respond_to?(:env)
+
+                Rails.env.respond_to?(:test?) && Rails.env.test?
+            end
 
             def build_configuration(profile, engine_name, options)
                 fixture_options = options.fetch(:fixtures, {})
@@ -123,7 +131,7 @@ module LesliTesting
 
                 default_owner = engine_name if profile == "engine"
                 owner = options.fetch(:owner, default_owner)
-                shared = Array(options.fetch(:shared, default_shared))
+                shared = (default_shared + Array(options[:shared])).uniq
                 default_classes = if includes_lesli_fixtures?(owner, shared)
                     LESLI_FIXTURE_CLASSES
                 else
@@ -148,9 +156,10 @@ module LesliTesting
                 {
                     enabled: true,
                     owner: options.fetch(:owner, engine_name),
+                    owner_explicit: options.key?(:owner),
                     include_dummy: options.fetch(:include_dummy, true),
                     include_owner: options.fetch(:include_owner, true),
-                    shared: Array(options.fetch(:shared, default_shared)),
+                    shared: (default_shared + Array(options[:shared])).uniq,
                     paths: Array(options[:paths])
                 }
             end
@@ -158,7 +167,7 @@ module LesliTesting
             def default_shared_engines(profile, engine_name)
                 return ["Lesli"] if profile == "app"
                 return [] unless profile == "engine"
-                return [] if engine_name.to_s == "Lesli"
+                return [] if ["Lesli", "Lesli::Engine"].include?(engine_name.to_s)
 
                 ["Lesli"]
             end
@@ -246,7 +255,7 @@ module LesliTesting
                 sets == :all ? test_case.fixtures(:all) : test_case.fixtures(*Array(sets))
             end
 
-            def migration_paths(application)
+            def migration_paths(application, engine_target: nil)
                 configuration = @configuration[:migrations]
                 paths = []
 
@@ -255,7 +264,12 @@ module LesliTesting
                 end
 
                 if configuration[:include_owner]
-                    paths << engine_path(resolve_engine(configuration[:owner]), "db", "migrate")
+                    owner = if configuration[:owner_explicit]
+                        configuration[:owner]
+                    else
+                        engine_target || configuration[:owner]
+                    end
+                    paths << engine_path(resolve_engine(owner), "db", "migrate")
                 end
 
                 configuration[:shared].each do |shared_engine|

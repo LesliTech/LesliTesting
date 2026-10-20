@@ -16,6 +16,75 @@ class ConfigurationTest < Minitest::Test
         assert_profile(:engine, "lesli_rails_engine", fake_rails: :engine)
     end
 
+    def test_engine_railtie_uses_the_configured_target_only_in_test
+        script = <<~'RUBY'
+            module ActiveSupport
+                HOOKS = Hash.new { |hash, key| hash[key] = [] }
+
+                def self.on_load(name, **options, &block)
+                    HOOKS[name] << block
+                end
+            end
+
+            module Rails
+                class Environment
+                    def initialize(name)
+                        @name = name
+                    end
+
+                    def test?
+                        @name == "test"
+                    end
+                end
+
+                class << self
+                    attr_accessor :env
+                end
+
+                class Engine
+                    class << self
+                        def initializer(name, **options, &block)
+                            initializer_blocks[name] = block
+                        end
+
+                        def initializer_blocks
+                            @initializer_blocks ||= {}
+                        end
+                    end
+                end
+            end
+
+            $LOADED_FEATURES << "active_support/lazy_load_hooks.rb"
+            $LOADED_FEATURES << "rails.rb"
+            $LOADED_FEATURES << "rails/engine.rb"
+
+            require "lesli_testing"
+            LesliTesting.engine("DisplayName", engine: "TargetEngine")
+
+            calls = []
+            LesliTesting::Fixtures.define_singleton_method(:configure_migration_paths) do |application, engine_target:|
+                calls << [application, engine_target]
+            end
+
+            application = Object.new
+            initializer = LesliTesting::Engine.initializer_blocks.fetch(
+                "lesli_testing.load_required_migrations"
+            )
+
+            Rails.env = Rails::Environment.new("development")
+            initializer.call(application)
+            abort "Railtie changed migrations outside test" unless calls.empty?
+
+            Rails.env = Rails::Environment.new("test")
+            initializer.call(application)
+
+            abort "Wrong configured target" unless LesliTesting::Engine.engine_target == "TargetEngine"
+            abort "Target was not passed to migrations" unless calls == [[application, "TargetEngine"]]
+        RUBY
+
+        assert_child_success(script, coverage: false)
+    end
+
     def test_gem_selects_gem_coverage_profile_without_loading_rails
         assert_profile(:gem, "lesli_rails_gem", forbid_rails: true)
     end
@@ -83,6 +152,7 @@ class ConfigurationTest < Minitest::Test
             <<~RUBY
                 abort "Engine Railtie missing" unless $LOADED_FEATURES.any? { |path| path.end_with?("lesli_testing/engine.rb") }
                 abort "Engine initializer missing" unless LesliTesting::Engine.initializers.include?("lesli_testing.load_required_migrations")
+                abort "Wrong engine target" unless LesliTesting::Engine.engine_target == "ExampleProject"
                 abort "Rails hooks were not registered" unless ActiveSupport::HOOKS.key?(:active_support_test_case)
             RUBY
         when :gem

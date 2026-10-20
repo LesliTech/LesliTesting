@@ -51,7 +51,16 @@ module LesliTesting
         end
 
         def engine(name, options = {})
-            configure(name, options.merge(coverage_profile: "engine"))
+            engine_options = options.dup
+            engine_target = engine_options.delete(:engine) || name
+
+            configure(
+                name,
+                engine_options.merge(
+                    coverage_profile: "engine",
+                    engine_target: engine_target
+                )
+            )
         end
 
         def gem(name, options = {})
@@ -118,6 +127,7 @@ module LesliTesting
             LesliTesting::RailsIntegration.install!(
                 profile: self.options[:coverage_profile],
                 project_name: self.app_name,
+                engine_target: self.options[:engine_target],
                 options: self.options
             )
         end
