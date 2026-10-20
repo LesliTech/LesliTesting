@@ -135,13 +135,20 @@ Run the default test task from the LesliTesting directory:
 bundle exec rake
 ```
 
-Run the reporter demonstration failures explicitly with `DEMO=true`:
+Run the intentional reporter failures manually when visually inspecting its output:
 
 ```shell
-DEMO=true bundle exec ruby -Itest test/demo_test.rb
+bundle exec ruby examples/reporter_demo.rb
 ```
 
 The demo command is expected to fail and is intended for visually checking failure formatting.
+
+Run the optional reporter benchmark separately from the test suite. It renders 5,000 results by default:
+
+```shell
+bundle exec ruby benchmark/reporter_benchmark.rb
+ITERATIONS=10000 bundle exec ruby benchmark/reporter_benchmark.rb
+```
 
 <br />
 

@@ -24,6 +24,33 @@ class CliReporterTest < Minitest::Test
         assert_includes formatted, message
     end
 
+    def test_formats_boolean_and_nil_failures
+        message = "Expected true to be nil"
+
+        formatted = @reporter.send(:parse_minitest_assertion_messages, message)
+
+        assert_equal Termline::Style.colorize(" #{Termline::Style.icon(:info)}  #{message}", :skyblue), formatted
+    end
+
+    def test_formats_expected_and_actual_lines
+        expected = @reporter.send(:parse_minitest_assertion_messages, "Expected: 1")
+        actual = @reporter.send(:parse_minitest_assertion_messages, "Actual: 2")
+
+        assert_equal Termline::Style.colorize(" #{Termline::Style.icon(:add)}  Expected: 1", :green), expected
+        assert_equal Termline::Style.colorize(" #{Termline::Style.icon(:remove)}    Actual: 2", :red), actual
+    end
+
+    def test_formats_rails_difference_messages_without_loading_rails
+        missing_change = %q{"User.count" didn't change by 1}
+        actual_change = "actual change was 0"
+
+        [missing_change, actual_change].each do |message|
+            formatted = @reporter.send(:parse_minitest_assertion_messages, message)
+
+            assert_equal Termline::Style.colorize(" #{Termline::Style.icon(:warning)}  #{message}", :yellow), formatted
+        end
+    end
+
     def test_formats_unknown_messages_with_supported_termline_styles
         message = "RuntimeError: original diagnostic"
 
@@ -34,10 +61,16 @@ class CliReporterTest < Minitest::Test
     end
 
     def test_formats_unified_diff_headers_without_duplicating_plus_signs
+        removed_header = @reporter.send(:parse_minitest_assertion_messages, "--- expected")
         header = @reporter.send(:parse_minitest_assertion_messages, "+++ actual")
+        hunk = @reporter.send(:parse_minitest_assertion_messages, "@@ -1 +1 @@")
+        removed_line = @reporter.send(:parse_minitest_assertion_messages, "-removed")
         added_line = @reporter.send(:parse_minitest_assertion_messages, "+added")
 
+        assert_equal Termline::Style.colorize("--- expected", :red), removed_header
         assert_equal Termline::Style.colorize("+++ actual", :green), header
+        assert_equal Termline::Style.colorize("@@ -1 +1 @@", :skyblue), hunk
+        assert_equal Termline::Style.colorize(" - -removed", :red), removed_line
         refute_includes header, "+++++ actual"
         assert_equal Termline::Style.colorize(" + +added", :green), added_line
         refute_includes added_line, "+++added"
@@ -60,7 +93,7 @@ class CliReporterTest < Minitest::Test
 
         assert_includes output, "Running tests for ExampleApp (Rails application)..."
         assert_includes output, "clean database"
-        assert_includes output, "rake dev:db:reset"
+        assert_includes output, "rake dev:db:rebuild"
     end
 
     def test_engine_header_uses_rails_test_application_guidance
@@ -68,14 +101,14 @@ class CliReporterTest < Minitest::Test
 
         assert_includes output, "Running tests for ExampleEngine (Rails engine)..."
         assert_includes output, "engine's Rails test application"
-        refute_includes output, "rake dev:db:reset"
+        refute_includes output, "rake dev:db:rebuild"
     end
 
     def test_gem_header_omits_rails_and_database_guidance
         output = render_header("gem", "ExampleGem")
 
         assert_includes output, "Running tests for ExampleGem (Ruby gem)..."
-        refute_match(/Rails|database|rake dev:db:reset/i, output)
+        refute_match(/Rails|database|rake dev:db:rebuild/i, output)
     end
 
     def test_failure_details_use_original_class_and_failure_location
