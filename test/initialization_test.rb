@@ -120,7 +120,9 @@ class InitializationTest < Minitest::Test
             abort "Wrong integration base" unless LesliTesting::IntegrationTester < integration_base
             abort "Wrong view base" unless LesliTesting::ViewTester < view_base
             abort "Wrong model base" unless LesliTesting::ModelTester < model_base
-            abort "Response helper missing" unless LesliTesting::IntegrationTester < ResponseIntegrationHelper
+            abort "Namespaced response helper missing" unless defined?(LesliTesting::ResponseIntegrationHelper)
+            abort "Response helper missing" unless LesliTesting::IntegrationTester < LesliTesting::ResponseIntegrationHelper
+            abort "Global response helper leaked" if defined?(::ResponseIntegrationHelper)
         RUBY
 
         assert_child_success(script)

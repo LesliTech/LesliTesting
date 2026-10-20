@@ -30,17 +30,19 @@ Building a better future, one line of code at a time.
 // · 
 =end
 
-module ResponseIntegrationHelper
+module LesliTesting
+    module ResponseIntegrationHelper
 
-    # return the body of a request response parsed as JSON
-    def response_json
-        JSON.parse(@response.body.blank? ? "{}" : @response.body) 
-    end
+        # return the body of a request response parsed as JSON
+        def response_json
+            JSON.parse(@response.body.blank? ? "{}" : @response.body)
+        end
 
 
-    # test a standard successful response for lesli 3
-    def expect_response_with_successful 
-        assert_response(:success)
-        assert_equal("application/json; charset=utf-8", @response.content_type)
+        # test a standard successful response for lesli 3
+        def expect_response_with_successful
+            assert_response(:success)
+            assert_equal("application/json; charset=utf-8", @response.content_type)
+        end
     end
 end

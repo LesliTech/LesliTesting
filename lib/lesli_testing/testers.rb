@@ -73,7 +73,7 @@ module LesliTesting
                 require_relative "helpers/response_integration_helper"
 
                 tester = Class.new(test_case) do
-                    include ::ResponseIntegrationHelper
+                    include LesliTesting::ResponseIntegrationHelper
                 end
                 LesliTesting.const_set(:IntegrationTester, tester)
             end
