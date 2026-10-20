@@ -70,7 +70,7 @@ class AccountsControllerTest < LesliTesting::IntegrationTester
   test "returns the accounts collection" do
     get accounts_url, as: :json
 
-    expect_response_with_successful
+    assert_successful_json_response
     assert_kind_of Array, response_json
   end
 end

@@ -2,7 +2,7 @@
 
 Lesli
 
-Copyright (c) 2025, Lesli Technologies, S. A.
+Copyright (c) 2026, Lesli Technologies, S. A.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -30,19 +30,24 @@ Building a better future, one line of code at a time.
 // · 
 =end
 
+require "json"
+
 module LesliTesting
     module ResponseIntegrationHelper
 
         # return the body of a request response parsed as JSON
-        def response_json
-            JSON.parse(@response.body.blank? ? "{}" : @response.body)
+        def response_json(http_response = response)
+            JSON.parse(http_response.body.blank? ? "{}" : http_response.body)
         end
 
+        def assert_successful_json_response(http_response = response)
+            assert_predicate(http_response, :successful?)
+            assert_equal("application/json", http_response.media_type)
+        end
 
         # test a standard successful response for lesli 3
-        def expect_response_with_successful
-            assert_response(:success)
-            assert_equal("application/json; charset=utf-8", @response.content_type)
+        def expect_response_with_successful(http_response = response)
+            assert_successful_json_response(http_response)
         end
     end
 end

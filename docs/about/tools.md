@@ -83,7 +83,7 @@ class AccountsControllerTest < LesliTesting::IntegrationTester
   test "returns JSON" do
     get accounts_url, as: :json
 
-    expect_response_with_successful
+    assert_successful_json_response
     assert_kind_of Array, response_json
   end
 end
@@ -93,8 +93,9 @@ Available helpers:
 
 | Helper | Behavior |
 | --- | --- |
-| `response_json` | Parses the response body with `JSON.parse`; a blank body becomes an empty hash. |
-| `expect_response_with_successful` | Asserts a successful response and the `application/json; charset=utf-8` content type. |
+| `response_json(response = self.response)` | Parses the public response body with `JSON.parse`; a blank body becomes an empty hash. An explicit response may be supplied. |
+| `assert_successful_json_response(response = self.response)` | Asserts a successful response and the `application/json` media type, independently of its charset. |
+| `expect_response_with_successful(response = self.response)` | Compatibility wrapper for `assert_successful_json_response`. |
 
 ### ModelTester
 
