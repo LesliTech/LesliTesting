@@ -37,6 +37,10 @@ require "minitest/autorun"
 require "my_gem"
 ```
 
+Keep this order unchanged. Requiring `my_gem` before LesliTesting starts
+coverage means already evaluated files cannot appear as executed lines in the
+final report.
+
 ## Test files
 
 Write standard Minitest tests and require the shared helper:

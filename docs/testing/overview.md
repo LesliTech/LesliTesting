@@ -10,4 +10,8 @@ LesliTesting configures one shared Minitest workflow for three project shapes. S
 
 All profiles configure the custom Minitest reporter. When `COVERAGE` is set to `true`, `1`, or `yes`, they also start the matching SimpleCov profile and produce console and Cobertura output.
 
-Start with [Installation and configuration](/gems/testing/about/installation), then choose the guide for the repository being tested. [Testing tools](/gems/testing/about/tools) documents coverage options, shared test classes, response helpers, and fixture integration.
+Start with [Installation and configuration](/gems/testing/about/installation),
+review the definitive [load order and process behavior](/gems/testing/about/execution),
+then choose the guide for the repository being tested. [Testing tools](/gems/testing/about/tools)
+documents coverage options, shared test classes, response helpers, and fixture
+integration.

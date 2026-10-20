@@ -1,2 +1,2 @@
-<%= navigation_for_folder("gems", "testing", "about", order:["installation", "structure", "tools"]) %>
+<%= navigation_for_folder("gems", "testing", "about", order:["installation", "execution", "structure", "tools"]) %>
 <%= navigation_for_folder("gems", "testing", "testing", order:["overview", "applications", "engines", "gems"]) %>

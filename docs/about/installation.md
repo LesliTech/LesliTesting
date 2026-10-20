@@ -104,6 +104,10 @@ Rails engines should use the setup and Rails runner commands documented in [Test
 
 This order lets coverage observe application boot code while keeping Rails-specific test classes deferred until the Rails testing framework is ready.
 
+See [Load order and process behavior](/gems/testing/about/execution) for the
+complete initialization lifecycle, environment variables, and exit-code
+contract.
+
 ## Next steps
 
 - [Configure a Rails application](/gems/testing/testing/applications)

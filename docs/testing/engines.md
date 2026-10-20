@@ -97,6 +97,10 @@ require_relative "dummy/config/environment"
 require "rails/test_help"
 ```
 
+Keep this order unchanged. The profile must be selected before the dummy
+application boots; the shared tester classes become available after
+`rails/test_help` fires the Rails load hooks.
+
 After the dummy application boots, LesliTesting resolves `MyEngine::Engine` and configures:
 
 - `test/fixtures` and `test/fixtures/files` from the current engine;

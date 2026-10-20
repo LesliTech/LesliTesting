@@ -70,6 +70,22 @@ Set it to `0` to remove the limit.
 
 Values are case-insensitive and surrounding whitespace is ignored. Only `true`, `1`, and `yes` enable these options. Unset variables and values such as `false`, `0`, and `no` leave them disabled.
 
+`COVERAGE` is evaluated when `lesli_testing` is required, so it must be set
+before the Ruby process starts. `QUIET` changes reporter output only; it does not
+change assertions, summaries, coverage, or exit codes.
+
+## Process exit codes
+
+| Code | Meaning |
+| ---: | --- |
+| `0` | Tests passed; skipped tests are allowed. |
+| `1` | Failure, unexpected exception, warning promoted with `-Werror`, or explicit filter with no matching tests. |
+| `2` | SimpleCov result below `coverage_min_coverage`. |
+
+Other boot, dependency, signal, or operating-system failures may use other
+non-zero codes. See [Load order and process behavior](/gems/testing/about/execution)
+for the complete lifecycle.
+
 ## Shared Rails test classes
 
 The shared classes are registered through ActiveSupport load hooks. They are created when `rails/test_help` loads their corresponding Rails classes, regardless of whether LesliTesting was configured before or after the Rails application booted. Engine suites should still run through `bundle exec rails test` or `bundle exec rake app:test`.

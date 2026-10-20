@@ -28,6 +28,9 @@ end
 
 LesliTesting starts coverage before the application boots, registers its Minitest reporter, and then waits for Rails load hooks. Requiring `rails/test_help` creates the shared Rails base classes before the test files are loaded.
 
+Keep this order unchanged: loading `config/environment` before LesliTesting
+prevents coverage from observing application and engine boot code.
+
 ## Application coverage profile
 
 The application profile starts with SimpleCov's Rails defaults and tracks Ruby files under:
