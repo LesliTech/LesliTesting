@@ -1,0 +1,24 @@
+# LesliTesting
+#
+# Test, measure, and build the standalone Ruby gem through LesliActions.
+
+name: "Lesli CI"
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: "Test and build Ruby gem"
+    uses: LesliTech/LesliActions/.github/workflows/lesli-ci-gem.yaml@master
+    with:
+      ruby-version: "3.3.5"
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
