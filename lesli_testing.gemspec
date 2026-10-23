@@ -11,6 +11,7 @@ Gem::Specification.new do |spec|
     spec.email       = ["hello@lesli.tech"]
     spec.homepage    = "https://www.lesli.dev/"
     spec.summary     = "Shared testing and coverage configuration for the Lesli Platform."
+    spec.required_ruby_version = ">= 3.3", "< 4.0"
     spec.description = <<~DESC
         Core testing utilities for the Lesli Platform, providing standardized Minitest configuration, 
         coverage setup, and shared testing conventions across applications, engines and gems.
